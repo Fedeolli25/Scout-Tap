@@ -53,7 +53,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .brand small{display:block;font-size:11px;font-family:var(--font-body);font-weight:500;letter-spacing:.06em;color:var(--muted)}
 .sb{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:14px;background:var(--surface);border-radius:12px;padding:6px 14px;border:1px solid var(--line)}
 .sb-team{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
-.sb-team.a{justify-content:flex-end;flex-direction:row-reverse}
+.sb-team.R{justify-content:flex-end;flex-direction:row-reverse}
 .sb-name{font-family:var(--font-display);font-weight:600;font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-team.h .sb-name{color:var(--home)} .sb-team.a .sb-name{color:var(--away)}
 .tag{font-family:var(--font-mono);font-size:11px;padding:2px 6px;border-radius:6px;background:var(--surface2);color:var(--muted);white-space:nowrap}
@@ -96,11 +96,14 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .cl{fill:none;stroke:var(--court-line);stroke-width:.09}
 .guide{stroke:var(--court-line);stroke-width:.04;stroke-dasharray:.25 .25;opacity:.8}
 .netl{stroke:var(--net);stroke-width:.16;stroke-linecap:round}
+.srvz{stroke-width:.06}.srvz.h{fill:var(--home-soft);stroke:var(--home)}.srvz.a{fill:var(--away-soft);stroke:var(--away)}
+.srvz.on.h{fill:var(--home)}.srvz.on.a{fill:var(--away)}
+.srvzt{font-family:var(--font-display);font-weight:700;font-size:.95px;text-anchor:middle;fill:var(--ink)}
 .side{opacity:.55} .side.h{fill:var(--home-soft)} .side.a{fill:var(--away-soft)}
 .mk{stroke:var(--surface);stroke-width:.08} .mk.h{fill:var(--home)} .mk.a{fill:var(--away)}
 .mapsvg{width:100%;height:auto;display:block;max-width:820px;border-radius:10px;background:var(--surface2)}
 .arr{stroke-width:.11;stroke-linecap:round;opacity:.8;fill:none}
-.end{opacity:.95}
+.end{opacity:.95;stroke-width:0}
 .k-p{stroke:var(--e-perf);fill:var(--e-perf)} .k-g{stroke:var(--e-pos);fill:var(--e-pos)} .k-x{stroke:var(--e-ex);fill:var(--e-ex)}
 .k-n{stroke:var(--e-neg);fill:var(--e-neg)} .k-o{stroke:var(--e-poor);fill:var(--e-poor)} .k-e{stroke:var(--e-err);fill:var(--e-err)}
 .heat{fill:var(--e-err);opacity:.3}
@@ -188,7 +191,11 @@ button.brand{background:none;border:0;padding:0;text-align:left;color:inherit}
 .faults{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .faults .btn{height:52px}
 .btn.on{background:var(--ink);color:var(--bg)}
-.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.askserve{max-width:820px}.askserve h2{font-size:30px}
+.card.serve.h b{color:var(--home)}.card.serve.a b{color:var(--away)}
+.card.serve.h .ic{color:var(--home)}.card.serve.a .ic{color:var(--away)}
+.card.serve.sug{border:2px solid var(--ink)}
 .bctl{display:flex;gap:6px;width:100%;flex-wrap:wrap}
 .btn.sm{height:38px;font-size:13px;font-weight:500;flex:1;min-width:0}
 .bchip small{font-family:var(--font-mono);font-size:10px;opacity:.7}
@@ -296,11 +303,17 @@ function zoneOf(x,y){
   return{half,z:ZT[row][li],sub:SUB[fd][fl]};
 }
 function zoneCenter(t,z,serve){
+  if(serve&&SRVZ.includes(+z)){const lat=SRVZ.indexOf(+z)*1.8+.9;return t==='h'?{x:-1.2,y:lat}:{x:19.2,y:9-lat}}
   let row=0,li=0;ZT.forEach((r,i)=>r.forEach((v,j)=>{if(v==z){row=i;li=j}}));
   const d=serve?10:row*3+1.5,lat=li*3+1.5;
   return t==='h'?{x:9-d,y:lat}:{x:9+d,y:9-lat};
 }
 const opp=t=>t==='h'?'a':'h';
+// zone di battuta Data Volley lungo tutta la linea di fondo, da sinistra a destra di chi batte: 5 7 6 9 1
+const SRVZ=[5,7,6,9,1];
+function serveZone(t,y){const lat=t==='h'?y:9-y;return SRVZ[Math.min(4,Math.max(0,Math.floor(lat/1.8)))]}
+function servePt(t,y){const yy=Math.min(Math.max(y,0),9);return{x:t==='h'?-1.2:19.2,y:r1(yy)}}
+const sides=()=>S&&S.swap?['a','h']:['h','a'];
 const tc=t=>t==='h'?'*':'a';
 const p2=n=>String(n).padStart(2,'0');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -315,7 +328,7 @@ function blank(){return{
   zonesOn:true, view:'setup', statSet:'all', demo:false, confirmReset:false,
   srvType:{}, autoSet:true, info:{}, ltimes:[], lsnap:[], setLineups:{}, videoStart:'0:00', timeouts:{h:0,a:0}, setter:{h:null,a:null}, startSetter:{h:null,a:null}, subs:{h:{n:0,pairs:[]},a:{n:0,pairs:[]}}, lib:{h:null,a:null}, map:{team:'a',sk:'A',pl:'',ty:'',rot:'',mode:'arrows'}, matchId:'m'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), updatedAt:0, dev:''
 }}
-const UI_KEYS=['view','statSet','sel','pending','subMode','confirmReset','map','fault','libMode','dblMode','link'];
+const UI_KEYS=['askServe','view','statSet','sel','pending','subMode','confirmReset','map','fault','libMode','dblMode','link'];
 const FAULTS=['Errore generico','Rete','Invasione','Doppia','Quattro tocchi','Fallo di posizione','Accompagnata','Ritardo'];
 const STYPES=[['H','Flottante'],['M','Salto float'],['Q','Salto spin']];
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
@@ -520,14 +533,18 @@ function endRally(w){
   if((h>=tgt||a>=tgt)&&Math.abs(h-a)>=2){S.setOver=h>a?'h':'a';S.sets.push({h,a});addLine(`**${S.set}set`);if(!S.friendly&&setsWon(S.setOver)>=3)S.finished=true}
   predict();
 }
-function startSet(){
+function lineupError(){
   for(const t of ['h','a']){
     const L=S.start[t];
-    if(L.length!==6||L.some(n=>!n)||new Set(L).size!==6){toast(`Formazione ${S.teams[t].name}: servono 6 giocatori diversi`);return}
-    if(L.some(n=>isLib(t,n))){toast(`Formazione ${S.teams[t].name}: il libero non va nei sei di partenza`);return}
-    if(!S.startSetter||!L.includes(S.startSetter[t])){toast(`Formazione ${S.teams[t].name}: scegli il palleggiatore`);return}
+    if(L.length!==6||L.some(n=>!n)||new Set(L).size!==6)return`Formazione ${S.teams[t].name}: servono 6 giocatori diversi`;
+    if(L.some(n=>isLib(t,n)))return`Formazione ${S.teams[t].name}: il libero non va nei sei di partenza`;
+    if(!S.startSetter||!L.includes(S.startSetter[t]))return`Formazione ${S.teams[t].name}: scegli il palleggiatore`;
   }
-  snap();
+  return null;
+}
+function startSet(){
+  const err=lineupError();if(err){toast(err);return}
+  snap();S.askServe=false;
   S.lineup={h:[...S.start.h],a:[...S.start.a]};
   S.serving=S.firstServe;S.started=true;S.view='scout';S.rally=[];S.pending=null;S.subMode=null;S.libMode=null;
   S.subs={h:{n:0,pairs:[]},a:{n:0,pairs:[]}};S.lib={h:null,a:null};S.dblMode=null;S.setter={h:S.startSetter.h,a:S.startSetter.a};S.timeouts={h:0,a:0};S.link=null;
@@ -555,9 +572,8 @@ function header(){
   return `<div class="top">
     <button class="brand" data-act="view" data-v="home" aria-label="Torna alla home"><img class="logo" src="${LOGO}" alt="" width="44" height="44"><span>Scout Tap<small>${S.finished?'Partita conclusa':(S.friendly?'Amichevole · ':'')+'Set '+S.set}</small></span></button>
     <div class="sb">
-      <div class="sb-team h"><span class="serve-dot ${S.started&&S.serving==='h'?'on':''}"></span><span class="sb-name">${esc(h.name)}</span><span class="tag">P${rot('h')||'?'}</span></div>
-      <div class="sb-mid"><span class="sb-sets">${setsWon('h')}</span><span class="sb-score">${p2(S.score.h)} : ${p2(S.score.a)}</span><span class="sb-sets">${setsWon('a')}</span></div>
-      <div class="sb-team a"><span class="serve-dot ${S.started&&S.serving==='a'?'on':''}"></span><span class="sb-name">${esc(a.name)}</span><span class="tag">P${rot('a')||'?'}</span></div>
+      ${(()=>{const [L,Rt]=sides(),tm=(t,pos)=>`<div class="sb-team ${t} ${pos}"><span class="serve-dot ${S.started&&S.serving===t?'on':''}"></span><span class="sb-name">${esc(S.teams[t].name)}</span><span class="tag">P${rot(t)||'?'}</span></div>`;
+        return tm(L,'L')+`<div class="sb-mid"><span class="sb-sets">${setsWon(L)}</span><span class="sb-score">${p2(S.score[L])} : ${p2(S.score[Rt])}</span><span class="sb-sets">${setsWon(Rt)}</span></div>`+tm(Rt,'R')})()}
     </div>
     ${syncBadge()}
     <div class="tabs">${tab('scout','Scout')}${tab('stats','Statistiche')}${tab('codes','Codici')}${tab('setup','Formazioni')}</div>
@@ -572,11 +588,18 @@ function courtHTML(){
     const side=!pend.sz?pend.team:opp(pend.team);
     const shade=side==='h'?`<rect class="side h" x="-3" y="-1.5" width="12" height="12"/>`:`<rect class="side a" x="9" y="-1.5" width="12" height="12"/>`;
     const mk=pend.sz?`<circle class="mk ${pend.team}" cx="${pend.sx}" cy="${pend.sy}" r=".35"/>`:'';
-    return `<svg class="tapcourt" viewBox="-3 -1.5 24 12" data-act="tap" role="img" aria-label="Campo: tocca il punto">${shade}${courtLines(true)}${mk}</svg>`;
+    let strip='';
+    if(pend.sk==='S'){
+      // fascia di battuta dietro la linea di fondo di chi batte, divisa nelle 5 zone
+      const t=pend.team,x0=t==='h'?-2.9:18.1;
+      SRVZ.forEach((z,i)=>{const y0=t==='h'?i*1.8:9-(i+1)*1.8,cx=x0+1.4,cy=y0+.9,on=pend.sz==z;
+        strip+=`<rect class="srvz ${t} ${on?'on':''}" x="${x0}" y="${y0+.05}" width="2.8" height="1.7" rx=".2"/><text class="srvzt" x="${cx}" y="${cy+.32}"${S.swap?` transform="rotate(180 ${cx} ${cy})"`:''}>${z}</text>`});
+    }
+    return `<svg class="tapcourt" viewBox="-3 -1.5 24 12" data-act="tap" role="img" aria-label="Campo: tocca il punto"><g${S.swap?' transform="rotate(180 9 4.5)"':''}>${pend.sk==='S'&&!pend.sz?'':shade}${courtLines(true)}${strip}${mk}</g></svg>`;
   }
   let cells='';
   for(const t of ['h','a'])for(const z in PPOS[t]){
-    const [c,r]=PPOS[t][z];const n=S.lineup[t][z-1];const p=P(t,n)||{name:'',role:''};
+    const [c0,r0]=PPOS[t][z],c=S.swap?5-c0:c0,r=S.swap?4-r0:r0;const n=S.lineup[t][z-1];const p=P(t,n)||{name:'',role:''};
     const on=S.sel&&S.sel.team===t&&S.sel.num==n;
     const out=S.subMode&&S.subMode.team===t&&S.subMode.out==n;
     const ball=!S.rally.length&&t===S.serving&&z==1;
@@ -616,7 +639,7 @@ function viewScout(){
     const last=S.rallies[S.rallies.length-1];
     return last?`<span class="lbl">Ultimo punto</span><span class="code ${last.winner}">${esc(S.teams[last.winner].name)}</span>`:'<span class="lbl">Azione in corso</span>';
   })();
-  return `<div class="scout"><section class="left">${courtHTML()}<div class="benches">${benchHTML('h')}${benchHTML('a')}</div><div class="rally">${rallyChips}</div></section>
+  return `<div class="scout"><section class="left">${courtHTML()}<div class="benches">${benchHTML(sides()[0])}${benchHTML(sides()[1])}</div><div class="rally">${rallyChips}</div></section>
     <section class="pad">${S.setOver?padSetOver():S.pending?padZones():S.fault?padFault():S.link?padLink():padMain()}</section></div>`;
 }
 function padFault(){
@@ -652,8 +675,8 @@ function padSetOver(){
 function padZones(){
   const p=S.pending;const pl=P(p.team,p.num);
   return `<div class="who"><span class="big ${p.team}">${p.num}</span><span>${esc(pl?pl.name:'')} · ${SKN[p.sk]} <b>${p.ev}</b></span></div>
-  <div class="panel-big"><span class="lbl">Direzione</span><h2>${p.sz?`Dove cade la palla`:`Punto di partenza`}</h2>
-  <p class="note">${p.sz?`Partenza da zona ${p.sz}. Tocca il punto esatto in cui cade la palla nel campo avversario, anche fuori dalle linee.`:`Tocca il punto da cui parte ${p.sk==='S'?'la battuta, anche dietro la linea di fondo':"l'attacco"} nel campo di ${esc(S.teams[p.team].name)}.`}</p>
+  <div class="panel-big"><span class="lbl">Direzione</span><h2>${p.sz?`Dove cade la palla`:(p.sk==='S'?'Zona di battuta':'Punto di partenza')}</h2>
+  <p class="note">${p.sz?`Partenza da zona ${p.sz}. Tocca il punto esatto in cui cade la palla nel campo avversario, anche fuori dalle linee.`:(p.sk==='S'?`Batte ${pl?pl.name:p.num} (zona 1). Tocca il punto della fascia di battuta da cui parte: zone 5 7 6 9 1 lungo tutta la linea di fondo.`:`Tocca il punto da cui parte l'attacco nel campo di ${esc(S.teams[p.team].name)}.`)}</p>
   <div class="row"><button class="btn" data-act="zskip">${p.sz?'Salva senza arrivo':'Salva senza zone'}</button><button class="btn ghost" data-act="zcancel">Indietro</button></div></div>`;
 }
 function padMain(){
@@ -669,13 +692,14 @@ function padMain(){
   return `<div class="who">${who}</div>
   <div class="skills">${sk}</div>${ty}
   ${dual?ev:`<div class="evals">${ev}</div>`}
-  <div class="row"><button class="btn h" data-act="point" data-t="h">Punto ${esc(S.teams.h.name)}</button><button class="btn a" data-act="point" data-t="a">Punto ${esc(S.teams.a.name)}</button></div>
-  <div class="row"><button class="btn err h" data-act="fault" data-t="h">Errore / fallo ${esc(S.teams.h.name)}</button><button class="btn err a" data-act="fault" data-t="a">Errore / fallo ${esc(S.teams.a.name)}</button></div>
-  <div class="row"><button class="btn to" data-act="timeout" data-t="h">Time out ${esc(S.teams.h.name)} · ${(S.timeouts||{}).h||0}/2</button><button class="btn to" data-act="timeout" data-t="a">Time out ${esc(S.teams.a.name)} · ${(S.timeouts||{}).a||0}/2</button></div>
+  <div class="row">${sides().map(t=>`<button class="btn ${t}" data-act="point" data-t="${t}">Punto ${esc(S.teams[t].name)}</button>`).join('')}</div>
+  <div class="row">${sides().map(t=>`<button class="btn err ${t}" data-act="fault" data-t="${t}">Errore / fallo ${esc(S.teams[t].name)}</button>`).join('')}</div>
+  <div class="row">${sides().map(t=>`<button class="btn to" data-act="timeout" data-t="${t}">Time out ${esc(S.teams[t].name)} · ${(S.timeouts||{})[t]||0}/2</button>`).join('')}</div>
   <div class="tools">
     <button class="btn" data-act="undo">Annulla</button>
     <button class="btn ${S.zonesOn?'on':''}" data-act="zones">Zone ${S.zonesOn?'sì':'no'}</button>
     <button class="btn ${S.autoSet?'on':''}" data-act="autoset">Alzata auto ${S.autoSet?'sì':'no'}</button>
+    <button class="btn" data-act="swap">⇄ Inverti campo</button>
   </div>
   <div class="log"><span class="lbl">Ultimi codici</span>${last.map((c,i)=>`<div class="ln ${/^.\d\dE/.test(c)?'auto':''}"><span>${S.lines.length-i}</span><b>${c}</b></div>`).join('')||'<span class="note">Nessuna azione</span>'}</div>`;
 }
@@ -1184,7 +1208,15 @@ function roleHint(t){
   L.forEach((n,i)=>{if(n)g[SEATS[(i-si+6)%6]].push(n)});
   return `<p class="note">${Object.entries(g).map(([k,v])=>`${names[k]}: <b>${v.join(', ')||'–'}</b>`).join(' · ')}</p>`;
 }
+function serveAsk(){
+  const sug=S.set>1&&S.set<5?S.firstServe:null;
+  const b=t=>`<button class="card serve ${t} ${sug===t?'sug':''}" data-act="servepick" data-t="${t}"><span class="ic">●</span><b>${esc(S.teams[t].name)}</b><small>${sug===t?'Tocca a lei per alternanza':'Inizia al servizio'}</small></button>`;
+  return `<div class="sheet askserve"><span class="lbl">Set ${S.set}${S.set===5?' · tie-break: dopo il sorteggio':''}</span><h2>Chi batte per primo?</h2>
+    <div class="cards">${b(sides()[0])}${b(sides()[1])}</div>
+    <div class="actions"><button class="btn ghost" data-act="askcancel">Torna alle formazioni</button><span style="flex:1"></span><button class="btn" data-act="swap">⇄ Inverti campo: ${esc(S.teams[sides()[1]].name)} a sinistra</button></div></div>`;
+}
 function viewSetup(){
+  if(S.askServe&&!S.started)return serveAsk();
   const team=t=>{
     const pl=S.teams[t].players.slice().sort((x,y)=>x.n-y.n);
     const sel=z=>`<label>Z${z}<select data-act="lineup" data-t="${t}" data-z="${z}" id="lu-${t}-${z}"><option value="">–</option>${pl.map(p=>`<option value="${p.n}" ${S.start[t][z-1]==p.n?'selected':''}>${p.n} ${esc(p.name)}${p.role==='L'?' (L)':''}</option>`).join('')}</select></label>`;
@@ -1199,9 +1231,7 @@ function viewSetup(){
   const infoBox=`<div class="sheet"><h2>Dati partita (per il tabellino)</h2><div class="infogrid">${fi('fase','Fase','Andata, Ritorno, Playoff…')}${fi('citta','Città')}${fi('impianto','Impianto')}${fi('spettatori','Spettatori')}${fi('arbitri','Arbitri')}${fi('mvp','MVP')}${fi('all_h','Allenatore '+esc(S.teams.h.name))}${fi('ass_h','Assistente '+esc(S.teams.h.name))}${fi('all_a','Allenatore '+esc(S.teams.a.name))}${fi('ass_a','Assistente '+esc(S.teams.a.name))}</div></div>`;
   return `<div class="grid2">${team('h')}${team('a')}</div>${infoBox}
   <div class="sheet"><div class="actions">
-    <span class="lbl">Batte per prima</span>
-    <div class="filters"><button class="${S.firstServe==='h'?'on':''}" data-act="fs" data-t="h">${esc(S.teams.h.name)}</button><button class="${S.firstServe==='a'?'on':''}" data-act="fs" data-t="a">${esc(S.teams.a.name)}</button></div>
-    <button class="btn on" data-act="startset" ${S.started?'disabled':''}>${S.started?`Set ${S.set} in corso`:`Inizia set ${S.set}`}</button>
+    <button class="btn on" data-act="askserve" ${S.started?'disabled':''}>${S.started?`Set ${S.set} in corso`:`Formazioni pronte: inizia il set ${S.set}`}</button>
     <span style="flex:1"></span><button class="btn ghost" data-act="finish">${S.finished?'Riapri la partita':'Termina la partita'}</button>
   </div><p class="note">${db?'Ogni modifica si salva online: apri questa pagina da un altro dispositivo per vedere e continuare la stessa partita.':'I dati restano salvati su questo dispositivo.'} Le modifiche alla rosa valgono subito; la formazione si usa all'avvio del set.</p></div>`;
 }
@@ -1257,6 +1287,7 @@ document.addEventListener('click',e=>{
     case 'faultr':{const ft=S.fault;S.fault=null;if(!ft)return;commit({team:ft,num:'$$',sk:'&',ty:'H',ev:'=',reason:b.dataset.r});toast(`${b.dataset.r}: punto ${S.teams[opp(ft)].name}`);return;}
     case 'stype':S.srvType[S.sel.team+S.sel.num]=b.dataset.k;break;
     case 'autoset':S.autoSet=!S.autoSet;break;
+    case 'swap':S.swap=!S.swap;toast(`Ora ${S.teams[sides()[0]].name} è a sinistra`);break;
     case 'listm':listMatches();return;
     case 'resume':{const r=resumable();if(!r)return;if(r.current){S.view=S.started?'scout':'setup';break}openAny(r.id,'scout');return;}
     case 'openx':openAny(b.dataset.id,b.dataset.v);return;
@@ -1281,13 +1312,15 @@ document.addEventListener('click',e=>{
       const p=S.pending;if(!p)return;
       const pt=b.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;
       const q=pt.matrixTransform(b.getScreenCTM().inverse());
-      const x=r1(Math.min(Math.max(q.x,-3),21)),y=r1(Math.min(Math.max(q.y,-1.5),10.5));
+      let x=r1(Math.min(Math.max(q.x,-3),21)),y=r1(Math.min(Math.max(q.y,-1.5),10.5));
+      if(S.swap){x=r1(18-x);y=r1(9-y)}
       const half=x<9?'h':'a';
+      const setStart=()=>{if(p.sk==='S'){const q2=servePt(p.team,y);p.sx=q2.x;p.sy=q2.y;p.sz=serveZone(p.team,y)}else{p.sx=x;p.sy=y;p.sz=zoneOf(x,y).z}};
       if(!p.sz){
-        if(half!==p.team){toast('Prima il punto di partenza, nel campo di chi gioca');return}
-        p.sx=x;p.sy=y;p.sz=zoneOf(x,y).z;break;
+        if(half!==p.team){toast(p.sk==='S'?'Tocca la fascia di battuta dietro il campo di chi batte':'Prima il punto di partenza, nel campo di chi gioca');return}
+        setStart();break;
       }
-      if(half===p.team){p.sx=x;p.sy=y;p.sz=zoneOf(x,y).z;toast('Partenza spostata');break}
+      if(half===p.team){setStart();toast('Partenza spostata');break}
       const zz=zoneOf(x,y);p.ex=x;p.ey=y;p.ez=zz.z;p.esub=zz.sub;
       commit({...p});return;}
     case 'map':{const k=b.dataset.k,v=b.dataset.v;S.map[k]=S.map[k]===v&&k!=='team'&&k!=='sk'&&k!=='mode'?'':v;if(k==='team')S.map.pl='';if(k==='sk'&&v!=='S')S.map.ty='';break}
@@ -1319,6 +1352,9 @@ document.addEventListener('click',e=>{
     case 'statset':S.statSet=b.dataset.s;break;
     case 'fs':S.firstServe=t;break;
     case 'startset':startSet();return;
+    case 'askserve':{const e=lineupError();if(e){toast(e);return}S.askServe=true;window.scrollTo(0,0);break;}
+    case 'askcancel':S.askServe=false;break;
+    case 'servepick':S.firstServe=t;startSet();return;
     case 'reset':
       if(!S.confirmReset){S.confirmReset=true;break}
       {const keep=S.teams,st=S.start;S=blank();S.teams=keep;S.start=st;hist=[];toast('Nuova partita: rose mantenute, scegli le formazioni');if(db){subscribe();listMatches()}}

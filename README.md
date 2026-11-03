@@ -45,6 +45,17 @@ Quando modifichi lo script, usa **Gestisci deployment → Modifica → Nuova ver
 
 Apri il sito in Safari, tocca **Condividi → Aggiungi alla schermata Home**. L'app si apre a schermo intero e funziona anche offline. I dati restano sempre salvati sull'iPad e si sincronizzano con il foglio quando torna la rete.
 
+## Come si usa
+
+All'apertura c'è la **Home**:
+
+- **Nuova partita**: scegli casa e ospiti tra le squadre salvate (o crei al volo l'avversario con il solo nome), poi imposti formazioni e palleggiatori.
+- **Riprendi partita**: riapre la partita in corso, anche dopo aver chiuso l'app.
+- **Squadre**: roster salvati con allenatore, assistente e liberi. Le modifiche fatte durante una partita (per esempio un giocatore aggiunto) tornano anche nella squadra salvata.
+- **Partite e statistiche**: tutte le partite, in corso e concluse, con statistiche, tabellino e play by play.
+
+Quando una squadra vince 3 set compaiono due bottoni: **Chiudi la rilevazione** oppure **Amichevole: gioca il set successivo**. In amichevole la partita resta aperta e a fine di ogni set scegli se continuare o chiudere. In **Formazioni** puoi anche terminare o riaprire la partita a mano. Nell'export .dvw finiscono al massimo 5 set, come in Data Volley; tabellino e play by play li contengono tutti. Il logo in alto riporta sempre alla Home.
+
 ## Come si salva
 
 - **Su ogni dispositivo**: sempre, a ogni azione.

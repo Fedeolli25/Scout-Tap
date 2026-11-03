@@ -156,6 +156,32 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .btn.err{background:none;font-weight:500;font-size:14px}
 .btn.err.h{color:var(--home);border-color:var(--home)} .btn.err.a{color:var(--away);border-color:var(--away)}
 .infogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.home{display:flex;flex-direction:column;gap:14px;max-width:1000px;width:100%;margin:0 auto}
+.hero{display:flex;align-items:center;gap:18px;padding:8px 4px}
+.hero img{width:96px;height:96px;border-radius:50%;box-shadow:0 0 0 1px var(--line)}
+.hero h1{font-family:var(--font-display);font-size:44px;margin:0;line-height:1;text-transform:uppercase;letter-spacing:.03em}
+.hero p{margin:4px 0 0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--line);min-height:120px}
+.card .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--surface2);font-family:var(--font-display);font-size:22px;font-weight:700}
+.card b{font-family:var(--font-display);font-size:24px;font-weight:700}
+.card small{color:var(--muted);font-size:13px}
+.card.main{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card.main small{color:var(--bg);opacity:.75}.card.main .ic{background:var(--home);color:#fff}
+.card:disabled{opacity:.5;cursor:default}
+button.brand{background:none;border:0;padding:0;text-align:left;color:inherit}
+.linkbtn{background:none;border:0;padding:0;color:var(--home);text-decoration:underline;font:inherit;cursor:pointer}
+.matches .match{cursor:default}
+.mbtns{display:flex;gap:6px;flex-wrap:wrap}
+.arow{display:flex;gap:8px;align-items:center}.arow .match{flex:1;min-width:0}.arow>.btn{flex:none;width:auto}
+.btn.friendly{border-color:var(--e-ex);color:var(--ink);background:color-mix(in srgb,var(--e-ex) 18%,var(--surface))}
+.btn.danger{color:var(--e-err);border-color:var(--e-err)}
+.teamlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.tchip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);text-align:left}
+.tchip b{font-size:15px}.tchip small{color:var(--muted)}
+.tchip.on{border:2px solid var(--ink)}
+.tchip.add{border-style:dashed;background:none}
+@media (max-width:640px){.cards{grid-template-columns:1fr}.hero h1{font-size:34px}.arow{flex-wrap:wrap}}
 .dvwbox{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px;max-width:640px}
 .filebtn{display:inline-flex;align-items:center;cursor:pointer}
 .btn.to{background:none;font-weight:500;font-size:13px;height:40px}
@@ -294,7 +320,7 @@ const FAULTS=['Errore generico','Rete','Invasione','Doppia','Quattro tocchi','Fa
 const STYPES=[['H','Flottante'],['M','Salto float'],['Q','Salto spin']];
 function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):null}catch(e){return null}}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function save(){S.updatedAt=Date.now();S.dev=DEV;saveLocal();queueSync()}
+function save(){S.updatedAt=Date.now();S.dev=DEV;saveLocal();queueSync();archPut()}
 function snap(){hist.push(JSON.stringify(S));if(hist.length>200)hist.shift()}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,1800)}
 
@@ -491,7 +517,7 @@ function endRally(w){
   addLine(`${tc(w)}p${p2(S.score.h)}:${p2(S.score.a)}`);
   S.rally=[];S.subMode=null;
   const tgt=S.set===5?15:25,h=S.score.h,a=S.score.a;
-  if((h>=tgt||a>=tgt)&&Math.abs(h-a)>=2){S.setOver=h>a?'h':'a';S.sets.push({h,a});addLine(`**${S.set}set`)}
+  if((h>=tgt||a>=tgt)&&Math.abs(h-a)>=2){S.setOver=h>a?'h':'a';S.sets.push({h,a});addLine(`**${S.set}set`);if(!S.friendly&&setsWon(S.setOver)>=3)S.finished=true}
   predict();
 }
 function startSet(){
@@ -508,42 +534,15 @@ function startSet(){
   if(!S.setLineups)S.setLineups={};S.setLineups[S.set]={h:[...S.lineup.h],a:[...S.lineup.a],sh:S.setter.h,sa:S.setter.a,rh:rot('h'),ra:rot('a'),t:Date.now()};
   predict();save();render();
 }
-function nextSet(){snap();S.set++;S.score={h:0,a:0};S.setOver=null;S.started=false;S.firstServe=opp(S.firstServe);S.view='setup';save();render()}
+function nextSet(){snap();S.finished=false;S.set++;S.score={h:0,a:0};S.setOver=null;S.started=false;S.firstServe=opp(S.firstServe);S.view='setup';save();render()}
 
-function demo(){
-  S=blank();S.demo=true;
-  S.teams.h={name:'Pol. Lambro',players:parseRoster(`3 Galli\n7 Ferri\n11 Riva\n14 Conti\n9 Sala\n5 Bassi\n1 Moro L\n12 Fontana L\n10 Testa\n8 Rota\n16 Neri\n18 Pozzi`)};
-  S.teams.a={name:'Volley Adda',players:parseRoster(`2 Longo\n8 Fumagalli\n12 Colombo\n4 Brambilla\n6 Villa\n15 Cattaneo\n10 Re L\n11 Gatti L\n3 Sironi\n14 Bianchi\n13 Monti\n17 Valli`)};
-  S.start={h:[3,7,11,14,9,5],a:[2,8,12,4,6,15]};S.startSetter={h:3,a:2};S.setter={h:3,a:2};
-  S.setLineups={1:{h:[...S.start.h],a:[...S.start.a],sh:3,sa:2,rh:1,ra:1,t:Date.now()}};
-  S.lineup={h:[...S.start.h],a:[...S.start.a]};S.serving='h';S.started=true;S.view='scout';
-  let seed=7;const jit=()=>{seed=(seed*9301+49297)%233280;return seed/233280*2-1};
-  const go=(t,n,sk,ev,sz,ez,ty)=>{const a={team:t,num:n,sk,ev,sz,ez,ty};
-    if(sz){const c=zoneCenter(t,sz,sk==='S');a.sx=r1(c.x+jit()*.4);a.sy=r1(c.y+jit()*1.1)}
-    if(ez){const c=zoneCenter(opp(t),ez);a.ex=r1(c.x+jit()*1.2);a.ey=r1(c.y+jit()*1.2);a.esub=zoneOf(a.ex,a.ey).sub}prepare(a);pushAct(a);correlate(a);const e=ending(sk,ev);if(e)endRally(e==='self'?t:opp(t))};
-  go('h',3,'S','-',1,5,'M');go('a',8,'R','#');go('a',4,'A','#',4,1);
-  go('a',8,'S','=',1);
-  go('h',7,'S','!',1,6,'Q');go('a',6,'R','+');go('a',12,'A','-',3,6);go('h',9,'D','+');go('h',14,'A','#',2,5);
-  go('h',7,'S','+',1,1);go('a',6,'R','-');go('a',4,'A','/',4,2);
-  go('h',7,'S','=',1);
-  go('a',12,'S','+',1,5,'M');go('h',1,'R','+');go('h',11,'A','#',3,7);
-  go('h',11,'S','-',1,6);go('a',10,'R','+');go('a',12,'A','+',3,7);go('h',1,'D','+');go('h',7,'A','!',4,1);go('a',10,'D','#');go('a',4,'A','#',2,5);
-  go('a',4,'S','+',1,6,'H');go('h',1,'R','!');go('h',14,'A','-',2,1);go('a',10,'D','+');go('a',8,'A','#',4,1);
-  go('a',4,'S','-',1,5,'H');go('h',9,'R','#');go('h',5,'A','#',3,6);
-  go('h',5,'S','+',1,1,'M');go('a',6,'R','+');go('a',4,'A','=',4,5);
-  go('h',5,'S','-',1,5,'M');go('a',10,'R','#');go('a',15,'A','#',3,1);
-  go('a',15,'S','+',1,6,'M');go('h',1,'R','+');go('h',14,'A','#',2,1);
-  go('h',14,'S','#',1,1,'Q');
-  go('h',14,'S','+',1,5,'Q');go('a',10,'R','+');go('a',4,'A','!',4,1);go('h',11,'B','-');go('a',10,'D','+');go('a',15,'A','-',3,6);go('h',11,'B','+');go('h',1,'D','+');go('h',7,'A','#',4,1);
-  {const a={team:'a',num:'$$',sk:'&',ty:'H',ev:'=',reason:'Rete'};prepare(a);pushAct(a);endRally('h')}
-  go('h',14,'S','-',1,6,'Q');go('a',10,'R','+');go('a',6,'A','+',4,5);go('h',1,'D','-');go('h',9,'F','+');go('h',7,'A','#',4,1);
-  predict();hist=[];
-}
 
 /* ---------- rendering ---------- */
 function render(){
   const app=document.getElementById('app');
   let body='';
+  const outer={home:viewHome,teams:viewTeams,newmatch:viewNewMatch,archive:viewArchive}[S.view];
+  if(outer){app.innerHTML=homeHeader({home:'',teams:'Squadre',newmatch:'Nuova partita',archive:'Archivio'}[S.view])+outer();return}
   if(S.view==='scout')body=S.started?viewScout():viewNotStarted();
   else if(S.view==='stats')body=viewStats();
   else if(S.view==='codes')body=viewCodes();
@@ -554,15 +553,15 @@ function header(){
   const h=S.teams.h,a=S.teams.a;
   const tab=(v,l)=>`<button class="${S.view===v?'on':''}" data-act="view" data-v="${v}">${l}</button>`;
   return `<div class="top">
-    <div class="brand"><img class="logo" src="${LOGO}" alt="" width="44" height="44"><span>Scout Tap<small>Set ${S.set}</small></span></div>
+    <button class="brand" data-act="view" data-v="home" aria-label="Torna alla home"><img class="logo" src="${LOGO}" alt="" width="44" height="44"><span>Scout Tap<small>${S.finished?'Partita conclusa':(S.friendly?'Amichevole · ':'')+'Set '+S.set}</small></span></button>
     <div class="sb">
       <div class="sb-team h"><span class="serve-dot ${S.started&&S.serving==='h'?'on':''}"></span><span class="sb-name">${esc(h.name)}</span><span class="tag">P${rot('h')||'?'}</span></div>
       <div class="sb-mid"><span class="sb-sets">${setsWon('h')}</span><span class="sb-score">${p2(S.score.h)} : ${p2(S.score.a)}</span><span class="sb-sets">${setsWon('a')}</span></div>
       <div class="sb-team a"><span class="serve-dot ${S.started&&S.serving==='a'?'on':''}"></span><span class="sb-name">${esc(a.name)}</span><span class="tag">P${rot('a')||'?'}</span></div>
     </div>
     ${syncBadge()}
-    <div class="tabs">${tab('scout','Scout')}${tab('stats','Statistiche')}${tab('codes','Codici')}${tab('setup','Squadre')}</div>
-  </div>${S.demo?`<div class="demo"><b>Partita di esempio</b> Squadre e azioni inventate per provare l'app. Quando sei pronto, vai su Squadre e inserisci le tue.</div>`:''}`;
+    <div class="tabs">${tab('scout','Scout')}${tab('stats','Statistiche')}${tab('codes','Codici')}${tab('setup','Formazioni')}</div>
+  </div>`;
 }
 function viewNotStarted(){
   return `<div class="sheet"><h2>Set ${S.set} non ancora iniziato</h2><p class="note">Controlla le formazioni di partenza e chi batte per primo, poi avvia il set.</p><div class="actions"><button class="btn h" data-act="view" data-v="setup">Vai alle formazioni</button></div></div>`;
@@ -639,9 +638,16 @@ function padLink(){
 }
 function padSetOver(){
   const w=S.setOver,s=S.sets[S.sets.length-1];
+  if(S.finished)return `<div class="panel-big"><span class="lbl">Partita conclusa</span><h2>${esc(S.teams[w].name)} vince ${setsWon(w)}–${setsWon(opp(w))}</h2>
+  <p class="note">${S.sets.map((x,i)=>`Set ${i+1}: ${x.h}–${x.a}`).join(' · ')}</p>
+  <div class="row"><button class="btn on" data-act="closematch">Chiudi la rilevazione</button><button class="btn friendly" data-act="friendly">Amichevole: gioca il set ${S.set+1}</button></div>
+  <p class="note">In amichevole la partita resta aperta: a fine di ogni set scegli se giocarne un altro o chiudere.</p>
+  <div class="row"><button class="btn" data-act="pdftab">Tabellino PDF</button><button class="btn" data-act="pdfpbp">Play by play PDF</button></div>
+  <div class="row"><button class="btn ghost" data-act="undo">Annulla ultimo punto</button><button class="btn ghost" data-act="view" data-v="home">Home</button></div></div>`;
   return `<div class="panel-big"><span class="lbl">Fine set ${S.set}</span><h2>${esc(S.teams[w].name)} vince ${Math.max(s.h,s.a)}–${Math.min(s.h,s.a)}</h2>
   <p class="note">Puoi annullare l'ultimo punto se è stato inserito per errore.</p>
-  <div class="row"><button class="btn ghost" data-act="undo">Annulla ultimo</button><button class="btn on" data-act="nextset">Set ${S.set+1}: formazioni</button></div></div>`;
+  <div class="row"><button class="btn ghost" data-act="undo">Annulla ultimo</button><button class="btn on" data-act="nextset">Set ${S.set+1}: formazioni</button></div>
+  ${S.friendly?`<div class="row"><span class="note">Amichevole · ${setsWon('h')}–${setsWon('a')} nei set</span><button class="btn" data-act="closematch">Chiudi la rilevazione</button></div>`:''}</div>`;
 }
 function padZones(){
   const p=S.pending;const pl=P(p.team,p.num);
@@ -831,6 +837,7 @@ function dvw(){
   let curSet=0,prev={h:null,a:null};
   S.lines.forEach((c,i)=>{
     const t=S.ltimes[i],sn=S.lsnap[i]||snapStr(),[st,rh,ra]=sn.split('|');
+    if(+st>5)return; // Data Volley gestisce al massimo 5 set
     if(+st!==curSet&&!/^\*\*\dset/.test(c)){
       curSet=+st;const L=S.setLineups[curSet];
       if(L){const sz=`${curSet}|${L.rh}|${L.ra}|${L.h.join(',')}|${L.a.join(',')}`;
@@ -892,7 +899,7 @@ function skillStats(L){
 }
 function report(){
   const {rallies,events}=analyze();
-  const sets=[1,2,3,4,5].filter(k=>rallies.some(r=>r.set===k)||S.setLineups&&S.setLineups[k]);
+  const NS=Math.max(5,S.set||1),sets=Array.from({length:NS},(_,i)=>i+1).filter(k=>rallies.some(r=>r.set===k)||S.setLineups&&S.setLineups[k]);
   const out={rallies,events,sets,team:{}};
   for(const t of ['h','a']){
     const acts=S.actions.filter(a=>a.team===t&&a.sk!=='&');
@@ -900,7 +907,7 @@ function report(){
     const players=S.teams[t].players.slice().sort((x,y)=>x.n-y.n).map(p=>{
       const L=acts.filter(a=>a.num==p.n),st=skillStats(L);
       const bp=rallies.filter(r=>r.serving===t&&r.winner===t&&r.scorer&&r.scorer.team===t&&r.scorer.num==p.n).length;
-      const setMarks=[1,2,3,4,5].map(k=>{
+      const setMarks=Array.from({length:Math.max(5,S.set||1)},(_,i)=>i+1).map(k=>{
         const SL=S.setLineups&&S.setLineups[k];if(!SL)return'';
         const z=SL[t].findIndex(x=>x==p.n);if(z>=0)return'z'+(z+1);
         const played=events.some(e=>e.kind==='sub'&&e.team===t&&e.set===k&&e.inn==p.n)||L.some(a=>a.set===k);
@@ -1029,12 +1036,12 @@ function teamBlock(doc,R,t,y){
     zTxt(o.st.aT),zTxt(o.st.aE),zTxt(o.st.aM),zTxt(o.st.aP),pc(pctTxt(o.st.aP,o.st.aT)),pc(pctTxt(o.st.aP-o.st.aE-o.st.aM,o.st.aT)),
     zTxt(o.st.bP),zTxt(o.st.bE),zTxt(o.falli||0)];
   const body=T.players.map(x=>row(x.p.n,x.p.role==='L'?'L':'',x.p.name,x.setMarks,{pts:x.st.pts,bp:x.bp,vp:x.vp,st:x.st,falli:0}));
-  body.push(row('','',  'Totali squadra',['','','','',''],{pts:T.pts,bp:T.bpTot,vp:T.vpTot,st:T.tot,falli:T.falli}));
+  body.push(row('','',  'Totali squadra',[],{pts:T.pts,bp:T.bpTot,vp:T.vpTot,st:T.tot,falli:T.falli}));
   const grp=(c,s)=>({content:c,colSpan:s,styles:{halign:'center'}});
   doc.autoTable({startY:y,margin:{left:M,right:M},theme:'plain',
     styles:{font:'helvetica',fontSize:6.3,cellPadding:{top:.32,bottom:.32,left:.55,right:.55},textColor:PDFC.ink,halign:'right',lineColor:PDFC.line,lineWidth:{bottom:.1}},
     headStyles:{fontStyle:'bold',fillColor:soft,textColor:PDFC.ink,halign:'right'},
-    head:[[{content:L1(S.teams[t].name),colSpan:3,styles:{halign:'left',textColor:col,fontSize:8}},grp('Set 1 2 3 4 5',1),grp('Punti',3),grp('Battuta',3),grp('Ricezione',5),grp('Attacco',6),grp('Muro',2),grp('Falli',1)],
+    head:[[{content:L1(S.teams[t].name),colSpan:3,styles:{halign:'left',textColor:col,fontSize:8}},grp('Set',1),grp('Punti',3),grp('Battuta',3),grp('Ricezione',5),grp('Attacco',6),grp('Muro',2),grp('Falli',1)],
       ['N','','Nome','','Tot','BP','V-P','Tot','Err','Pt','Tot','Err','Pos%','Prf%','Eff%','Tot','Err','Mur','Pt','Pt%','Eff%','Pt','Err','Tot']],
     body,
     columnStyles:{0:{cellWidth:6},1:{cellWidth:3,halign:'center'},2:{cellWidth:31,halign:'left'},3:{cellWidth:22},4:{cellWidth:6},5:{cellWidth:6},6:{cellWidth:7}},
@@ -1045,7 +1052,7 @@ function teamBlock(doc,R,t,y){
     },
     didDrawCell:h=>{
       if(h.section!=='body'||h.column.index!==3||!h.cell.raw||!h.cell.raw.marks)return;
-      const marks=h.cell.raw.marks,w=h.cell.width/5,cy=h.cell.y+h.cell.height/2;
+      const marks=h.cell.raw.marks,w=h.cell.width/Math.max(5,marks.length),cy=h.cell.y+h.cell.height/2;
       marks.forEach((m,i)=>{const cx=h.cell.x+w*i+w/2;
         if(m.startsWith('z')){doc.setDrawColor(...PDFC.ink);doc.setLineWidth(.15);doc.circle(cx,cy,1.25);doc.setFontSize(5.6);doc.setTextColor(...PDFC.ink);doc.text(m.slice(1),cx,cy+.75,{align:'center'})}
         else if(m==='-'){doc.setDrawColor(...PDFC.ink);doc.setLineWidth(.25);doc.line(cx-1.2,cy,cx+1.2,cy)}});
@@ -1188,24 +1195,14 @@ function viewSetup(){
     <label class="f">Palleggiatore (decide la rotazione e i ruoli)<select id="ps-${t}" data-act="setter" data-t="${t}"><option value="">–</option>${S.start[t].map((n,i)=>n?`<option value="${n}" ${S.startSetter&&S.startSetter[t]==n?'selected':''}>${n} ${esc((P(t,n)||{}).name||'')} · P${i+1}</option>`:'').join('')}</select></label>
     ${roleHint(t)}</div>`;
   };
-  const cfg=!IN_CLAUDE?sheetsCfg():null;
-  const sh=IN_CLAUDE?'':`<div class="sheet"><h2>Salvataggio online</h2>
-    ${cfg&&db?`<p class="note">Collegato a Google Sheets. Ogni modifica si salva nel foglio e gli altri dispositivi collegati si aggiornano ogni pochi secondi.</p>
-    <div class="actions"><button class="btn ghost" data-act="sheetsunlink">Scollega</button></div>`
-    :`<p class="note">Collega il tuo foglio Google (vedi istruzioni nel README) per ritrovare le partite su iPad, Mac e telefono.</p>
-    <label class="f">Indirizzo dello script (finisce con /exec)<input type="text" id="sh-url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(cfg?cfg.url:'')}"></label>
-    <label class="f">Chiave<input type="text" id="sh-key" value="${esc(cfg?cfg.token:'')}"></label>
-    <div class="actions"><button class="btn on" data-act="sheetslink">Collega</button></div>`}</div>`;
-  const ml=db?`<div class="sheet"><div class="actions"><h2>Partite salvate</h2><button class="btn ghost" data-act="listm">Aggiorna elenco</button></div>
-    <div class="matches">${matchList===null?'<span class="note">Caricamento…</span>':matchList.length?matchList.map(m=>`<button class="match ${m.id===S.matchId?'on':''}" data-act="openm" data-id="${esc(m.id)}"><span><b>${esc(m.title)}</b><br><small>${new Date(m.updatedAt).toLocaleString('it-IT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</small></span><span class="tag">${esc(m.score||'')}</span></button>`).join(''):'<span class="note">Nessuna partita salvata. Le partite si salvano da sole appena inserisci le tue squadre.</span>'}</div></div>`:'';
   const inf=S.info||{},fi=(k,l,ph='')=>`<label class="f">${l}<input type="text" id="inf-${k}" data-act="info" data-k="${k}" value="${esc(inf[k]||'')}" placeholder="${ph}"></label>`;
   const infoBox=`<div class="sheet"><h2>Dati partita (per il tabellino)</h2><div class="infogrid">${fi('fase','Fase','Andata, Ritorno, Playoff…')}${fi('citta','Città')}${fi('impianto','Impianto')}${fi('spettatori','Spettatori')}${fi('arbitri','Arbitri')}${fi('mvp','MVP')}${fi('all_h','Allenatore '+esc(S.teams.h.name))}${fi('ass_h','Assistente '+esc(S.teams.h.name))}${fi('all_a','Allenatore '+esc(S.teams.a.name))}${fi('ass_a','Assistente '+esc(S.teams.a.name))}</div></div>`;
-  return `${sh}${ml}<div class="grid2">${team('h')}${team('a')}</div>${infoBox}
+  return `<div class="grid2">${team('h')}${team('a')}</div>${infoBox}
   <div class="sheet"><div class="actions">
     <span class="lbl">Batte per prima</span>
     <div class="filters"><button class="${S.firstServe==='h'?'on':''}" data-act="fs" data-t="h">${esc(S.teams.h.name)}</button><button class="${S.firstServe==='a'?'on':''}" data-act="fs" data-t="a">${esc(S.teams.a.name)}</button></div>
     <button class="btn on" data-act="startset" ${S.started?'disabled':''}>${S.started?`Set ${S.set} in corso`:`Inizia set ${S.set}`}</button>
-    <button class="btn ghost" data-act="reset">${S.confirmReset?'Conferma: cancella tutta la partita':'Nuova partita'}</button>
+    <span style="flex:1"></span><button class="btn ghost" data-act="finish">${S.finished?'Riapri la partita':'Termina la partita'}</button>
   </div><p class="note">${db?'Ogni modifica si salva online: apri questa pagina da un altro dispositivo per vedere e continuare la stessa partita.':'I dati restano salvati su questo dispositivo.'} Le modifiche alla rosa valgono subito; la formazione si usa all'avvio del set.</p></div>`;
 }
 
@@ -1217,7 +1214,7 @@ document.addEventListener('click',e=>{
   if(act!=='reset')S.confirmReset=false;
   const nLines=S.lines.length,nHist=hist.length;
   switch(act){
-    case 'view':S.view=b.dataset.v;break;
+    case 'view':S.view=b.dataset.v;if(['home','archive'].includes(S.view))archPut(true);break;
     case 'player':{
       if(S.link){
         if(S.link.team!==t){toast(`Tocca un giocatore di ${S.teams[S.link.team].name}`);return}
@@ -1261,6 +1258,18 @@ document.addEventListener('click',e=>{
     case 'stype':S.srvType[S.sel.team+S.sel.num]=b.dataset.k;break;
     case 'autoset':S.autoSet=!S.autoSet;break;
     case 'listm':listMatches();return;
+    case 'resume':{const r=resumable();if(!r)return;if(r.current){S.view=S.started?'scout':'setup';break}openAny(r.id,'scout');return;}
+    case 'openx':openAny(b.dataset.id,b.dataset.v);return;
+    case 'delask':delAsk=b.dataset.id;render();return;
+    case 'delm':delAsk=null;deleteMatch(b.dataset.id);return;
+    case 'tedit':teamEdit=b.dataset.id;teamDel=false;render();return;
+    case 'tnew':{const tm=newTeam('');libSave();teamEdit=tm.id;teamDel=false;render();setTimeout(()=>{const el=document.getElementById('tl-name');if(el){el.select();el.focus()}},50);return;}
+    case 'tdone':teamEdit=null;teamDel=false;render();return;
+    case 'tdel':if(!teamDel){teamDel=true;render();return}LIB.teams=LIB.teams.filter(x=>x.id!==teamEdit);libSave();teamEdit=null;teamDel=false;toast('Squadra eliminata');render();return;
+    case 'nmcreate':createMatch();return;
+    case 'closematch':S.finished=true;S.view='stats';archPut(true);toast('Rilevazione chiusa: la partita è in Partite e statistiche');break;
+    case 'friendly':S.friendly=true;S.finished=false;nextSet();toast(`Amichevole: imposta la formazione del set ${S.set}`);return;
+    case 'finish':S.finished=!S.finished;toast(S.finished?'Partita conclusa: la trovi in Partite e statistiche':'Partita riaperta');break;
     case 'openm':openMatch(b.dataset.id);return;
     case 'clearsel':S.sel.num=null;break;
     case 'eval':{
@@ -1345,16 +1354,180 @@ document.addEventListener('change',e=>{
       }catch(e){toast('File non valido: serve un backup .json di Scout Tap')}
     });return;
   }
+  if(act==='tl'){const tm=libTeam(teamEdit);if(!tm)return;const k=el.dataset.k;
+    if(k==='roster')tm.players=parseRoster(el.value);else tm[k]=el.value.trim()||(k==='name'?'Squadra senza nome':'');
+    libSave();pushLibToMatch(tm);render();return}
+  if(act==='nmsel'){newForm[t]=el.value;render();return}
+  if(act==='nmname'){newForm[t+'n']=el.value;return}
+  if(act==='nmfase'){newForm.fase=el.value;return}
   if(act==='info'){if(!S.info)S.info={};S.info[el.dataset.k]=el.value.trim();save();return}
   if(act==='vstart'){S.videoStart=el.value.trim()||'0:00';save();return}
   if(act==='mappl'){S.map.pl=el.value;saveLocal();render();return}
-  if(act==='name'){S.teams[t].name=el.value.trim()||(t==='h'?'Casa':'Ospiti');S.demo=false}
-  else if(act==='roster'){S.teams[t].players=parseRoster(el.value);S.demo=false}
+  if(act==='name'){S.teams[t].name=el.value.trim()||(t==='h'?'Casa':'Ospiti');S.demo=false;pushTeamToLib(t)}
+  else if(act==='roster'){S.teams[t].players=parseRoster(el.value);S.demo=false;pushTeamToLib(t)}
   else if(act==='setter'){if(!S.startSetter)S.startSetter={h:null,a:null};S.startSetter[t]=el.value?+el.value:null}
   else if(act==='lineup'){const z=+el.dataset.z;S.start[t][z-1]=el.value?+el.value:null;if(S.start[t].length<6)for(let i=0;i<6;i++)S.start[t][i]=S.start[t][i]??null}
   else return;
   save();render();
 });
+
+/* ---------- archivio locale delle partite ---------- */
+function archIdx(){try{return JSON.parse(localStorage.getItem(KEY+'.idx')||'[]')}catch(e){return[]}}
+let archT=null,archWarned=false;
+function archPut(now){
+  if(!S||S.demo||!(S.teamRef||S.lines.length||S.started))return;
+  clearTimeout(archT);
+  const run=()=>{try{
+    localStorage.setItem(KEY+'.m.'+S.matchId,JSON.stringify(persisted()));
+    const idx=archIdx().filter(x=>x.id!==S.matchId);
+    idx.unshift({id:S.matchId,...metaOf()});
+    localStorage.setItem(KEY+'.idx',JSON.stringify(idx.slice(0,300)));
+  }catch(e){if(!archWarned){archWarned=true;toast('Memoria del dispositivo piena: collega il salvataggio online o elimina vecchie partite')}}};
+  if(now)run();else archT=setTimeout(run,800);
+}
+function archGet(id){try{const r=localStorage.getItem(KEY+'.m.'+id);return r?JSON.parse(r):null}catch(e){return null}}
+function archDel(id){try{localStorage.removeItem(KEY+'.m.'+id);localStorage.setItem(KEY+'.idx',JSON.stringify(archIdx().filter(x=>x.id!==id)))}catch(e){}}
+function matchDate(m){return m.date||m.updatedAt||0}
+function allMatches(){
+  const map=new Map();
+  archIdx().forEach(m=>map.set(m.id,{...m,local:true}));
+  (matchList||[]).forEach(m=>{if(String(m.id).startsWith('__'))return;const o=map.get(m.id);if(!o||(m.updatedAt||0)>(o.updatedAt||0))map.set(m.id,{...o,...m,local:!!o})});
+  return [...map.values()].sort((a,b)=>matchDate(b)-matchDate(a));
+}
+const isFinished=m=>!!m.finished||/finita/.test(m.score||'');
+async function openAny(id,view){
+  archPut(true);
+  let d=archGet(id);
+  if(db){try{const o=await db.get(id);if(o&&(!d||(o.updatedAt||0)>(d.updatedAt||0)))d=o}catch(e){}}
+  if(!d){toast('Partita non trovata');return}
+  S=Object.assign(blank(),d,{view,statSet:'all',sel:null,pending:null,subMode:null,libMode:null,dblMode:null,link:null,fault:null,confirmReset:false,demo:false});
+  fixArrays();if(!S.setLineups)S.setLineups={};if(!S.startSetter)S.startSetter={h:null,a:null};
+  if(S.started&&!S.setOver)predict();
+  hist=[];saveLocal();subscribe();render();
+}
+async function deleteMatch(id){
+  archDel(id);
+  if(db&&db.del){try{await db.del(id)}catch(e){}}
+  matchList=(matchList||[]).filter(m=>m.id!==id);
+  if(S.matchId===id&&!S.demo){S=blank();S.view='home';saveLocal()}
+  toast('Partita eliminata');render();
+}
+
+/* ---------- squadre salvate ---------- */
+function libLoad(){try{return JSON.parse(localStorage.getItem(KEY+'.teams')||'null')||{teams:[],updatedAt:0}}catch(e){return{teams:[],updatedAt:0}}}
+let LIB=libLoad(),teamEdit=null,teamDel=false,newForm={h:'',a:'',hn:'',an:'',fase:''},delAsk=null;
+function libSave(){
+  LIB.updatedAt=Date.now();
+  try{localStorage.setItem(KEY+'.teams',JSON.stringify(LIB))}catch(e){}
+  if(db)db.save('__teams',{teams:LIB.teams,updatedAt:LIB.updatedAt,dev:DEV},{title:'__squadre',updatedAt:LIB.updatedAt,score:'',dev:DEV}).catch(()=>{});
+}
+async function libPull(){
+  if(!db)return;
+  try{
+    const d=await db.get('__teams');
+    if(d&&(d.updatedAt||0)>(LIB.updatedAt||0)){LIB={teams:d.teams||[],updatedAt:d.updatedAt};try{localStorage.setItem(KEY+'.teams',JSON.stringify(LIB))}catch(e){};render()}
+    else if(LIB.teams.length&&(LIB.updatedAt||0)>((d&&d.updatedAt)||0))libSave();
+  }catch(e){}
+}
+const libTeam=id=>LIB.teams.find(x=>x.id===id);
+function newTeam(name){const tm={id:'t'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:name||'Nuova squadra',players:[],coach:'',assistant:''};LIB.teams.push(tm);return tm}
+function mergePlayers(base,add){const m=new Map(base.map(p=>[p.n,{...p}]));add.forEach(p=>m.set(p.n,{...p}));return[...m.values()].sort((x,y)=>x.n-y.n)}
+// la rosa della partita e quella della squadra salvata restano allineate (si aggiungono o rinominano giocatori, non si tolgono)
+function pushTeamToLib(t){
+  const id=S.teamRef&&S.teamRef[t];const tm=id&&libTeam(id);if(!tm)return;
+  tm.name=S.teams[t].name;tm.players=mergePlayers(tm.players,S.teams[t].players);libSave();
+}
+function pushLibToMatch(tm){
+  if(!S||S.demo||S.finished||!S.teamRef)return;
+  for(const t of ['h','a'])if(S.teamRef[t]===tm.id){S.teams[t].name=tm.name;S.teams[t].players=mergePlayers(S.teams[t].players,tm.players);save()}
+}
+function resumable(){
+  if(S&&!S.demo&&!S.finished&&(S.started||S.lines.length||S.teamRef))return{id:S.matchId,title:`${S.teams.h.name} – ${S.teams.a.name}`,score:metaOf().score,current:true};
+  return allMatches().find(m=>!isFinished(m))||null;
+}
+
+/* ---------- viste fuori dalla partita ---------- */
+function homeHeader(title){
+  return `<div class="top"><button class="brand" data-act="view" data-v="home" aria-label="Home"><img class="logo" src="${LOGO}" alt="" width="44" height="44"><span>Scout Tap${title?`<small>${esc(title)}</small>`:''}</span></button>
+    <span style="flex:1"></span>${syncBadge()}${S.view!=='home'?'<button class="btn ghost" data-act="view" data-v="home">Home</button>':''}</div>`;
+}
+function viewHome(){
+  const r=resumable(),all=allMatches(),done=all.filter(isFinished).length;
+  const fdate=m=>matchDate(m)?new Date(matchDate(m)).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+  const cfg=!IN_CLAUDE?sheetsCfg():null;
+  const online=IN_CLAUDE?'':`<div class="sheet"><h2>Salvataggio online</h2>
+    ${cfg&&db?`<p class="note">Collegato a Google Sheets: partite e squadre si salvano nel foglio e gli altri dispositivi collegati si aggiornano da soli.</p>
+    <div class="actions"><button class="btn ghost" data-act="sheetsunlink">Scollega</button></div>`
+    :`<p class="note">Collega il tuo foglio Google (istruzioni nel README) per ritrovare partite e squadre su iPad, Mac e telefono.</p>
+    <label class="f">Indirizzo dello script (finisce con /exec)<input type="text" id="sh-url" placeholder="https://script.google.com/macros/s/…/exec" value="${esc(cfg?cfg.url:'')}"></label>
+    <label class="f">Chiave<input type="text" id="sh-key" value="${esc(cfg?cfg.token:'')}"></label>
+    <div class="actions"><button class="btn on" data-act="sheetslink">Collega</button></div>`}</div>`;
+  return `<div class="home">
+    <div class="hero"><img src="${LOGO}" alt="" width="96" height="96"><div><h1>Scout Tap</h1><p>Scouting di pallavolo a tap, con codici Data Volley</p></div></div>
+    <div class="cards">
+      <button class="card main" data-act="view" data-v="newmatch"><span class="ic">+</span><b>Nuova partita</b><small>Scegli le due squadre e la formazione</small></button>
+      <button class="card" data-act="resume" ${r?'':'disabled'}><span class="ic">▶</span><b>Riprendi partita</b><small>${r?`${esc(r.title)}${r.score?' · '+esc(r.score):''}`:'Nessuna partita in corso'}</small></button>
+      <button class="card" data-act="view" data-v="teams"><span class="ic">≡</span><b>Squadre</b><small>${LIB.teams.length?LIB.teams.length+' squadre salvate':'Inserisci i roster'}</small></button>
+      <button class="card" data-act="view" data-v="archive"><span class="ic">%</span><b>Partite e statistiche</b><small>${all.length?`${all.length} partite · ${done} concluse`:'Ancora nessuna partita'}</small></button>
+    </div>
+    ${all.length?`<div class="sheet"><h2>Ultime partite</h2><div class="matches">${all.slice(0,4).map(m=>matchRow(m,fdate)).join('')}</div></div>`:''}
+    ${online}
+  </div>`;
+}
+function matchRow(m,fdate){
+  const fin=isFinished(m);
+  return `<div class="match ${S.matchId===m.id&&!S.demo?'on':''}"><span><b>${esc(m.title||'Partita')}</b><br><small>${fdate(m)} · ${esc((m.score||'').replace(' (finita)',''))||'nessun set'} · ${fin?'conclusa':'in corso'}</small></span>
+    <span class="mbtns">${fin?'':`<button class="btn sm" data-act="openx" data-id="${esc(m.id)}" data-v="scout">Riprendi</button>`}<button class="btn sm on" data-act="openx" data-id="${esc(m.id)}" data-v="stats">Statistiche</button></span></div>`;
+}
+function viewArchive(){
+  const all=allMatches();
+  const fdate=m=>matchDate(m)?new Date(matchDate(m)).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+  return `<div class="sheet"><div class="actions"><h2>Partite e statistiche</h2><span style="flex:1"></span>${db?'<button class="btn ghost" data-act="listm">Aggiorna elenco</button>':''}</div>
+    <p class="note">Apri una partita per vedere statistiche, mappe delle direzioni, tabellino e play by play.</p>
+    <div class="matches">${all.length?all.map(m=>`<div class="arow">${matchRow(m,fdate)}${delAsk===m.id?`<button class="btn sm danger" data-act="delm" data-id="${esc(m.id)}">Conferma eliminazione</button>`:`<button class="btn sm ghost" data-act="delask" data-id="${esc(m.id)}" aria-label="Elimina">Elimina</button>`}</div>`).join(''):'<span class="note">Ancora nessuna partita. Creane una da "Nuova partita".</span>'}</div></div>`;
+}
+function viewTeams(){
+  const tm=teamEdit&&libTeam(teamEdit);
+  const list=`<div class="teamlist">${LIB.teams.length?LIB.teams.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<button class="tchip ${x.id===teamEdit?'on':''}" data-act="tedit" data-id="${x.id}"><b>${esc(x.name)}</b><small>${x.players.length} giocatori${x.players.filter(p=>p.role==='L').length?` · ${x.players.filter(p=>p.role==='L').length} liberi`:''}</small></button>`).join(''):'<span class="note">Nessuna squadra salvata.</span>'}
+    <button class="tchip add" data-act="tnew"><b>+ Nuova squadra</b><small>Roster, allenatore, liberi</small></button></div>`;
+  const form=tm?`<div class="sheet"><h2>${esc(tm.name)}</h2>
+    <label class="f">Nome squadra<input type="text" id="tl-name" data-act="tl" data-k="name" value="${esc(tm.name)}"></label>
+    <div class="grid2"><label class="f">Allenatore<input type="text" id="tl-coach" data-act="tl" data-k="coach" value="${esc(tm.coach||'')}"></label><label class="f">Assistente<input type="text" id="tl-ass" data-act="tl" data-k="assistant" value="${esc(tm.assistant||'')}"></label></div>
+    <label class="f">Roster: una riga per giocatore, "numero nome". Aggiungi L dopo il nome dei liberi (massimo 2)<textarea id="tl-roster" data-act="tl" data-k="roster" placeholder="3 Galli&#10;7 Ferri&#10;1 Moro L">${esc(tm.players.map(p=>`${p.n} ${p.name}${p.role==='L'?' L':''}`).join('\n'))}</textarea></label>
+    <p class="note">I ruoli non servono: in partita si ricavano dalla posizione del palleggiatore. Le modifiche si salvano da sole.</p>
+    <div class="actions"><button class="btn" data-act="tdone">Fatto</button><span style="flex:1"></span><button class="btn ${teamDel?'danger':'ghost'}" data-act="tdel">${teamDel?'Conferma: elimina la squadra':'Elimina squadra'}</button></div></div>`:'';
+  return `<div class="sheet"><h2>Squadre</h2><p class="note">Le squadre salvate qui si scelgono quando crei una nuova partita. Per gli avversari puoi anche inserire solo il nome e completare il roster in partita.</p>${list}</div>${form}`;
+}
+function viewNewMatch(){
+  const opts=sel=>`<option value="">Scegli…</option>${LIB.teams.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<option value="${x.id}" ${sel===x.id?'selected':''}>${esc(x.name)} (${x.players.length})</option>`).join('')}<option value="__new" ${sel==='__new'?'selected':''}>+ Nuova squadra…</option>`;
+  const side=(t,l)=>`<div class="sheet"><h2 class="${t}">${l}</h2>
+    <label class="f">Squadra<select id="nm-sel-${t}" data-act="nmsel" data-t="${t}">${opts(newForm[t])}</select></label>
+    ${newForm[t]==='__new'?`<label class="f">Nome della nuova squadra<input type="text" id="nm-new-${t}" data-act="nmname" data-t="${t}" value="${esc(newForm[t+'n'])}" placeholder="Es. Volley Adda"></label><p class="note">Il roster lo completi nella pagina successiva.</p>`:''}</div>`;
+  return `<div class="sheet"><h2>Nuova partita</h2><p class="note">Scegli le squadre. Nel passo successivo imposti formazioni, palleggiatori e chi batte.</p></div>
+    <div class="grid2">${side('h','Casa (*)')}${side('a','Ospiti (a)')}</div>
+    <div class="sheet"><label class="f">Fase (facoltativa)<input type="text" id="nm-fase" data-act="nmfase" value="${esc(newForm.fase)}" placeholder="Andata, Ritorno, Playoff…"></label>
+    <div class="actions"><button class="btn on" data-act="nmcreate">Crea partita e vai alle formazioni</button></div></div>`;
+}
+function createMatch(){
+  const pickTeam=t=>{
+    const v=newForm[t];
+    if(v==='__new'){const n=(newForm[t+'n']||'').trim();if(!n)return null;return newTeam(n)}
+    return libTeam(v)||null;
+  };
+  if(!newForm.h||!newForm.a){toast('Scegli entrambe le squadre');return}
+  if(newForm.h===newForm.a&&newForm.h!=='__new'){toast('Casa e ospiti devono essere squadre diverse');return}
+  const th=pickTeam('h'),ta=pickTeam('a');
+  if(!th||!ta){toast('Scrivi il nome della nuova squadra');return}
+  libSave();
+  archPut(true);
+  S=blank();S.view='setup';
+  S.teamRef={h:th.id,a:ta.id};
+  S.teams={h:{name:th.name,players:th.players.map(p=>({...p}))},a:{name:ta.name,players:ta.players.map(p=>({...p}))}};
+  S.info={fase:newForm.fase||'',all_h:th.coach||'',ass_h:th.assistant||'',all_a:ta.coach||'',ass_a:ta.assistant||''};
+  S.date=Date.now();
+  newForm={h:'',a:'',hn:'',an:'',fase:''};hist=[];
+  save();subscribe();render();toast('Partita creata');
+}
 
 /* ---------- sync tra dispositivi ---------- */
 const DEV=(()=>{try{let d=localStorage.getItem(KEY+'.dev');if(!d){d='d'+Math.random().toString(36).slice(2,10);localStorage.setItem(KEY+'.dev',d)}return d}catch(e){return 'd'+Math.random().toString(36).slice(2,10)}})();
@@ -1369,12 +1542,13 @@ function syncBadge(){
   return `<span class="sync ${c}"><i></i>${l}</span>`;
 }
 function persisted(){const o={};for(const k in S)if(!UI_KEYS.includes(k))o[k]=S[k];return o}
-function metaOf(){return{title:`${S.teams.h.name} – ${S.teams.a.name}`,updatedAt:S.updatedAt,dev:DEV,score:`${S.sets.map(x=>x.h+'-'+x.a).concat(S.started&&!S.setOver?[S.score.h+'-'+S.score.a]:[]).join(' ')}`}}
+function metaOf(){return{title:`${S.teams.h.name} – ${S.teams.a.name}`,updatedAt:S.updatedAt,dev:DEV,date:S.date||(S.ltimes||[]).find(Boolean)||S.updatedAt,finished:!!S.finished,score:`${S.sets.map(x=>x.h+'-'+x.a).concat(S.started&&!S.setOver?[S.score.h+'-'+S.score.a]:[]).join(' ')}${S.finished?' (finita)':''}`}}
 
 /* archivio dentro Claude */
 function claudeStore(d){return{
   kind:'claude',
-  async save(id,body,meta){await d.doc('matches/'+id).set(body);await d.doc('index/'+id).set({title:meta.title,updatedAt:meta.updatedAt,score:meta.score})},
+  async save(id,body,meta){await d.doc('matches/'+id).set(body);await d.doc('index/'+id).set({title:meta.title,updatedAt:meta.updatedAt,score:meta.score,date:meta.date||0,finished:!!meta.finished})},
+  async del(id){await d.doc('matches/'+id).delete();await d.doc('index/'+id).delete()},
   async get(id){const s=await d.doc('matches/'+id).get();return s.exists?s.data():null},
   async list(){const q=await d.collection('index').orderBy('updatedAt','desc').limit(40).get();return q.docs.map(x=>({id:x.id,...x.data()}))},
   watch(id,cb){return d.doc('matches/'+id).onSnapshot(s=>cb(s.exists?s.data():null,s.metadata.hasPendingWrites),()=>{syncSt='err';refreshBadge()})}
@@ -1400,6 +1574,7 @@ function sheetsStore(cfg){
       if(!m.exists||m.updatedAt<meta.updatedAt)throw new Error('non confermato');
     },
     async get(id){const r=await q({action:'get',id});return r.exists?r.data:null},
+    async del(id){await fetch(cfg.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:cfg.token,action:'delete',id})})},
     async list(){const r=await q({action:'list'});return r.matches||[]},
     watch(id,cb){
       let stop=false,busy=false;
@@ -1456,7 +1631,7 @@ function subscribe(){
 async function listMatches(){
   if(!db)return;
   try{matchList=await db.list()}catch(e){matchList=[]}
-  if(S.view==='setup')render();
+  if(['home','archive'].includes(S.view))render();
 }
 async function openMatch(id){
   try{
@@ -1469,9 +1644,9 @@ async function openMatch(id){
 }
 async function connectStore(store){
   db=store;matchList=null;
+  await libPull();
   await listMatches();
-  if(S.demo&&matchList&&matchList.length){await openMatch(matchList[0].id);toast("Aperta l'ultima partita salvata");return}
-  subscribe();render();
+  if(!S.demo)subscribe();render();
 }
 async function initSync(){
   if(IN_CLAUDE){
@@ -1496,7 +1671,9 @@ function downloadFile(name,text,type){const b=new Blob([text],{type});const u=UR
 const fileBase=()=>`${new Date().toISOString().slice(0,10)}_${S.teams.h.name}_${S.teams.a.name}`.replace(/[^\w\-]+/g,'_');
 
 S=load();
-if(!S||S.demo){demo();saveLocal()}
+if(!S||S.demo){S=blank()}
+S.view='home';
+if(!S.demo&&(S.started||S.lines.length))setTimeout(()=>archPut(true),0);
 if(!S.matchId)S.matchId=blank().matchId;
 if(!S.srvType)S.srvType={};
 if(S.autoSet===undefined)S.autoSet=true;

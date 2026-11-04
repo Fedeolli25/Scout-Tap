@@ -97,6 +97,12 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .guide{stroke:var(--court-line);stroke-width:.04;stroke-dasharray:.25 .25;opacity:.8}
 .netl{stroke:var(--net);stroke-width:.16;stroke-linecap:round}
 .srvbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 10px;border-radius:10px;background:var(--surface2);font-size:13px}.srvbar .btn.sm{flex:none;height:34px;padding:0 12px}
+.orb{position:absolute;z-index:2;width:clamp(42px,6.4vw,60px);height:clamp(42px,6.4vw,60px);border-radius:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:var(--surface);border:3px solid;box-shadow:0 2px 5px rgba(0,0,0,.2);line-height:1;padding:0}
+.orb.h{border-color:var(--home)}.orb.a{border-color:var(--away)}
+.orb .num{font-family:var(--font-display);font-weight:700;font-size:clamp(18px,2.7vw,26px)}.orb.h .num{color:var(--home)}.orb.a .num{color:var(--away)}
+.orb .rl{font-family:var(--font-mono);font-size:9px;color:var(--muted)}
+.orb.on.h{background:var(--home-soft)}.orb.on.a{background:var(--away-soft)}.orb.on{box-shadow:0 0 0 3px var(--ink)}
+.orb.isl{background:color-mix(in srgb,var(--e-ex) 22%,var(--surface))}.orb.out{border-style:dashed}
 .courtwrap{display:flex;gap:6px;align-items:stretch}.courtwrap.sr{flex-direction:row-reverse}.courtwrap .court{flex:1;min-width:0}
 .srvstrip{display:flex;flex-direction:column;gap:4px;width:46px;flex:none}
 .srvstrip button{flex:1;border-radius:8px;border:2px solid;font-family:var(--font-display);font-weight:700;font-size:20px}
@@ -640,13 +646,14 @@ function courtHTML(){
     }
     return `<svg class="tapcourt" viewBox="-3 -1.5 24 12" data-act="tap" role="img" aria-label="Campo: tocca il punto"><g${S.swap?' transform="rotate(180 9 4.5)"':''}>${pend.sk==='S'&&!pend.sz?'':shade}${courtLines(true)}${strip}${mk}</g></svg>`;
   }
-  let cells='';
-  for(const t of ['h','a']){const dz=dispZones(t);for(let z=1;z<=6;z++){
+  let cells='',orbs='';
+  for(const t of ['h','a']){const dz=dispZones(t),sp=phaseOf(t)==='recv'?recvSpots(t):null;for(let z=1;z<=6;z++){
     const [c0,r0]=PPOS[t][dz[z-1]],c=S.swap?5-c0:c0,r=S.swap?4-r0:r0;const n=S.lineup[t][z-1];const p=P(t,n)||{name:'',role:''};
     const on=S.sel&&S.sel.team===t&&S.sel.num==n;
     const out=S.subMode&&S.subMode.team===t&&S.subMode.out==n;
     const ball=!S.rally.length&&t===S.serving&&z==1;
     const isL=S.lib&&S.lib[t]&&S.lib[t].num==n,sub=!!openPairOf(t,n);
+    if(sp){const q=sp[z-1];orbs+=`<button class="orb ${t} ${on?'on':''} ${out?'out':''} ${isL?'isl':''}" style="left:calc(8px + ${q.px}*(100% - 16px));top:calc(8px + ${q.py}*(100% - 16px))" data-act="player" data-t="${t}" data-n="${n}" aria-label="${n} ${esc(p.name)}"><span class="num">${n}</span><span class="rl">${roleOf(t,n)}</span></button>`;continue}
     cells+=`<button class="chip ${t} ${on?'on':''} ${out?'out':''} ${isL?'isl':''} ${sub?'issub':''}" style="grid-column:${c};grid-row:${r}" data-act="player" data-t="${t}" data-n="${n}">
       ${roleOf(t,n)?`<span class="role">${roleOf(t,n)}</span>`:''}${ball?'<span class="ball"></span>':''}
       <span class="num">${n}</span><span class="nm">${esc(p.name)}</span><span class="zn">${z}</span></button>`;
@@ -656,9 +663,9 @@ function courtHTML(){
     // zone di battuta accanto al campo: tocca la zona oppure direttamente chi riceve
     const st=S.serving,left=sides()[0]===st,order=left?[5,7,6,9,1]:[1,9,6,7,5];
     const strip=`<div class="srvstrip ${st}" aria-label="Zona di battuta">${order.map(z=>`<button data-act="srvz" data-z="${z}">${z}</button>`).join('')}</div>`;
-    return `<div class="courtwrap ${left?'sl':'sr'}">${strip}<div class="court players">${cells}</div></div>`;
+    return `<div class="courtwrap ${left?'sl':'sr'}">${strip}<div class="court players">${cells}${orbs}</div></div>`;
   }
-  return `<div class="court players">${cells}</div>`;
+  return `<div class="court players">${cells}${orbs}</div>`;
 }
 /* disposizione mostrata: 'rot' ordine di rotazione, 'spec' posizioni di gioco, 'recv' linea di ricezione */
 function phaseOf(t){
@@ -682,6 +689,23 @@ function dispZones(t){
   ord(recv).forEach((i,k)=>out[i]=[5,6,1][k]);
   ord(non).forEach((i,k)=>out[i]=[4,3,2][k]);
   return out;
+}
+/* ricezione: posizioni libere (sfere). d = distanza dalla rete 0-9, lat = 0 sinistra ... 9 destra della squadra */
+function recvSpots(t){
+  const si=setterIdx(t),seat=i=>SEATS[(i-si+6)%6],front=i=>i>=1&&i<=3,LAT=[2,2,1,0,0,1],pos=l=>l*3+1.5;
+  const recv=[],net=[],hide=[];
+  for(let i=0;i<6;i++){const r=seat(i);
+    if(r==='S'||(r==='C'&&!front(i)))recv.push(i);      // schiacciatori e libero / centrale di seconda linea
+    else if(r==='O'&&!front(i))hide.push(i);             // opposto di seconda linea (P4 P3 P2): dietro la linea di ricezione
+    else net.push(i)}                                    // palleggiatore, centrale e opposto di prima linea: a rete
+  const ord=a=>a.sort((x,y)=>LAT[x]-LAT[y]||(front(y)-front(x)));
+  const out=[];
+  ord(recv).forEach((i,k)=>out[i]={d:5.3,lat:[1.6,4.5,7.4][k]});
+  ord(net);
+  if(net.length===3)net.forEach((i,k)=>out[i]={d:1.1,lat:[1.6,4.5,7.4][k]});
+  else net.forEach(i=>out[i]={d:1.1,lat:pos(LAT[i])});
+  hide.forEach(i=>out[i]={d:7.7,lat:pos(LAT[i])});
+  return out.map(o=>{let x=t==='h'?9-o.d:9+o.d,y=t==='h'?o.lat:9-o.lat;if(S.swap){x=18-x;y=9-y}return{px:(x/18).toFixed(4),py:(y/9).toFixed(4)}});
 }
 function courtLines(guides){
   let g='';

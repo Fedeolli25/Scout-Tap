@@ -253,9 +253,13 @@ pre.codes{font-family:var(--font-mono);font-size:13px;line-height:1.55;backgroun
 label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600}
 input[type=text],textarea,select{font:inherit;font-size:15px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;-webkit-user-select:text;user-select:text;min-width:0}
 textarea{font-family:var(--font-mono);font-size:13px;min-height:190px;resize:vertical}
-.lineup{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.lineup .cap{grid-column:1/-1;font-size:11px;color:var(--muted)}
-.lineup label{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+.luhead{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.luhead .cap{font-size:11px;color:var(--muted)}
+.lineup{display:grid;grid-template-columns:repeat(3,76px);gap:8px;padding:10px;border-radius:10px;background:var(--court);border-top:4px solid var(--net);width:max-content;max-width:100%}
+.lineup .lu{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px}
+.lineup .luz{position:absolute;top:3px;left:6px;font-family:var(--font-mono);font-size:10px;color:var(--muted);pointer-events:none}
+.lineup select{width:76px;height:52px;text-align:center;text-align-last:center;font-family:var(--font-display);font-weight:700;font-size:24px;padding:0 4px;background:var(--surface)}
+.lineup .lun{font-size:10px;color:var(--muted);max-width:76px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:12px}
+.rotbtn{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px;font-weight:600}
 .note{font-size:13px;color:var(--muted);line-height:1.5;max-width:70ch}
 .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;z-index:20;max-width:calc(100% - 32px)}
@@ -1341,11 +1345,15 @@ function viewSetup(){
   if(S.askServe&&!S.started)return serveAsk();
   const team=t=>{
     const pl=S.teams[t].players.slice().sort((x,y)=>x.n-y.n);
-    const sel=z=>`<label>Z${z}<select data-act="lineup" data-t="${t}" data-z="${z}" id="lu-${t}-${z}"><option value="">–</option>${pl.map(p=>`<option value="${p.n}" ${S.start[t][z-1]==p.n?'selected':''}>${p.n} ${esc(p.name)}${p.role==='L'?' (L)':''}</option>`).join('')}</select></label>`;
+    const sel=z=>{const n=S.start[t][z-1],pp=n?P(t,n):null;
+      return `<label class="lu"><span class="luz">${z}</span><select data-act="lineup" data-t="${t}" data-z="${z}" id="lu-${t}-${z}" aria-label="Zona ${z}"><option value="">–</option>${pl.map(p=>`<option value="${p.n}" ${n==p.n?'selected':''}>${p.n}${p.role==='L'?' L':''}</option>`).join('')}</select><span class="lun">${pp?esc(pp.name):''}</span></label>`};
+    const sIdx=S.start[t].findIndex(x=>x&&S.startSetter&&x==S.startSetter[t]);
     return `<div class="sheet"><h2 class="${t}">${t==='h'?'Casa (*)':'Ospiti (a)'}</h2>
     <label class="f">Nome squadra<input type="text" id="nm-${t}" data-act="name" data-t="${t}" value="${esc(S.teams[t].name)}"></label>
     <label class="f">Rosa: una riga per giocatore, "numero nome". Aggiungi L dopo il nome dei liberi (massimo 2)<textarea id="ro-${t}" data-act="roster" data-t="${t}">${esc(rosterText(t))}</textarea></label>
-    <div class="lineup"><span class="cap">Formazione di partenza set ${S.set} — prima riga: zone 4 3 2 a rete</span>${sel(4)}${sel(3)}${sel(2)}${sel(5)}${sel(6)}${sel(1)}</div>
+    <div class="luhead"><span class="cap">Formazione di partenza set ${S.set} · rete in alto</span><span style="flex:1"></span>${sIdx>=0?`<span class="tag">P${sIdx+1}</span>`:''}
+      <button class="btn rotbtn" data-act="rotstart" data-t="${t}" title="Rotazione successiva" aria-label="Ruota la formazione: rotazione successiva"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9.5A7 7 0 1 1 5 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M2.8 5.2 5.6 10l4.9-2.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Ruota</button></div>
+    <div class="lineup">${sel(4)}${sel(3)}${sel(2)}${sel(5)}${sel(6)}${sel(1)}</div>
     <label class="f">Palleggiatore (decide la rotazione e i ruoli)<select id="ps-${t}" data-act="setter" data-t="${t}"><option value="">–</option>${S.start[t].map((n,i)=>n?`<option value="${n}" ${S.startSetter&&S.startSetter[t]==n?'selected':''}>${n} ${esc((P(t,n)||{}).name||'')} · P${i+1}</option>`:'').join('')}</select></label>
     ${roleHint(t)}</div>`;
   };
@@ -1522,6 +1530,9 @@ document.addEventListener('click',e=>{
     case 'nextset':nextSet();return;
     case 'statset':S.statSet=b.dataset.s;break;
     case 'fs':S.firstServe=t;break;
+    case 'rotstart':{const L=S.start[t];if(L.length<6||L.some(n=>!n)){toast('Completa prima i sei in campo');return}
+      S.start[t]=[L[1],L[2],L[3],L[4],L[5],L[0]];const i=S.start[t].findIndex(x=>S.startSetter&&x==S.startSetter[t]);
+      toast(i>=0?`${S.teams[t].name}: ora in P${i+1}`:`${S.teams[t].name}: formazione ruotata`);break;}
     case 'startset':startSet();return;
     case 'askserve':{const e=lineupError();if(e){toast(e);return}S.askServe=true;window.scrollTo(0,0);break;}
     case 'askcancel':S.askServe=false;break;

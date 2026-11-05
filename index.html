@@ -172,6 +172,14 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 .infogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
 .home{display:flex;flex-direction:column;gap:14px;max-width:1000px;width:100%;margin:0 auto}
 .hero{display:flex;align-items:center;gap:18px;padding:8px 4px}
+.gate{display:flex;flex-direction:column;gap:14px;max-width:720px;width:100%;margin:0 auto;padding-top:24px}
+.gate h2{font-size:26px}
+.note.small{font-size:11px}
+.mono{font-family:var(--font-mono)}
+.langsw{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;align-self:center}
+.langsw button{padding:8px 14px;border-radius:7px;font-weight:600;color:var(--muted)}
+.langsw button.on{background:var(--ink);color:var(--bg)}
+.hero{flex-wrap:wrap}
 .hero img{width:96px;height:96px;border-radius:50%;box-shadow:0 0 0 1px var(--line)}
 .hero h1{font-family:var(--font-display);font-size:44px;margin:0;line-height:1;text-transform:uppercase;letter-spacing:.03em}
 .hero p{margin:4px 0 0;color:var(--muted)}
@@ -288,6 +296,218 @@ textarea{font-family:var(--font-mono);font-size:13px;min-height:190px;resize:ver
 <script>
 const KEY='scoutTap.v1';
 const LOGO='data:image/jpeg;base64,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';
+/* ---------- lingua: italiano (originale) / inglese ---------- */
+let LANG=(()=>{try{return localStorage.getItem(KEY+'.lang')==='en'?'en':'it'}catch(e){return'it'}})();
+function LOC(){return LANG==='en'?'en-GB':'it-IT'}
+const TR_EXACT={
+// generali e navigazione
+'Scout Tap':'Scout Tap','Home':'Home','Scout':'Scout','Statistiche':'Statistics','Codici':'Codes','Formazioni':'Line-ups','Squadre':'Teams','Archivio':'Archive',
+'Scouting di pallavolo a tap, con codici Data Volley':'Tap volleyball scouting with Data Volley codes',
+'Nuova partita':'New match','Scegli le due squadre e la formazione':'Choose the two teams and the line-up','Riprendi partita':'Resume match','Nessuna partita in corso':'No match in progress',
+'Inserisci i roster':'Enter the rosters','Partite e statistiche':'Matches and statistics','Ancora nessuna partita':'No matches yet','Ultime partite':'Latest matches',
+'Riprendi':'Resume','Elimina':'Delete','Conferma eliminazione':'Confirm deletion','Aggiorna elenco':'Refresh list',
+'Apri una partita per vedere statistiche, mappe delle direzioni, tabellino e play by play.':'Open a match to see statistics, direction maps, score sheet and play by play.',
+'Ancora nessuna partita. Creane una da "Nuova partita".':'No matches yet. Create one from "New match".',
+'Salvataggio online':'Online saving','Chiave':'Key','Collega':'Connect','Scollega':'Disconnect',
+'Collega il tuo foglio Google (istruzioni nel README) per ritrovare partite e squadre su iPad, Mac e telefono.':'Connect your Google Sheet (instructions in the README) to find matches and teams on iPad, Mac and phone.',
+'Indirizzo dello script (finisce con /exec)':'Script address (ends with /exec)',
+'Collegato a Google Sheets: partite e squadre si salvano nel foglio e gli altri dispositivi collegati si aggiornano da soli.':'Connected to Google Sheets: matches and teams are saved in the sheet and the other connected devices update by themselves.',
+'Salvato online':'Saved online','Salvataggio…':'Saving…','Non salvato online':'Not saved online','Solo su questo dispositivo':'This device only','Esempio: non salvato online':'Example: not saved online',
+'Lingua':'Language',
+// squadre
+'+ Nuova squadra':'+ New team','+ Nuova squadra…':'+ New team…','Roster, allenatore, liberi':'Roster, coach, liberos','Nessuna squadra salvata.':'No saved teams.',
+'Le squadre salvate qui si scelgono quando crei una nuova partita. Per gli avversari puoi anche inserire solo il nome e completare il roster in partita.':'The teams saved here can be chosen when you create a new match. For opponents you can also enter just the name and complete the roster during the match.',
+'Nome squadra':'Team name','Allenatore':'Coach','Assistente':'Assistant','Fatto':'Done','Elimina squadra':'Delete team','Conferma: elimina la squadra':'Confirm: delete the team','Squadra senza nome':'Unnamed team',
+'Roster: una riga per giocatore, "numero nome". Aggiungi L dopo il nome dei liberi (massimo 2)':'Roster: one line per player, "number name". Add L after the name of the liberos (max 2)',
+'Rosa: una riga per giocatore, "numero nome". Aggiungi L dopo il nome dei liberi (massimo 2)':'Roster: one line per player, "number name". Add L after the name of the liberos (max 2)',
+'I ruoli non servono: in partita si ricavano dalla posizione del palleggiatore. Le modifiche si salvano da sole.':'Roles are not needed: during the match they are worked out from the setter\'s position. Changes are saved automatically.',
+// nuova partita
+'Scegli le squadre. Nel passo successivo imposti formazioni, palleggiatori e chi batte.':'Choose the teams. In the next step you set line-ups, setters and who serves.',
+'Casa (*)':'Home (*)','Ospiti (a)':'Away (a)','Squadra':'Team','Scegli…':'Choose…','Nome della nuova squadra':'Name of the new team','Il roster lo completi nella pagina successiva.':'You complete the roster on the next page.',
+'Fase (facoltativa)':'Stage (optional)','Crea partita e vai alle formazioni':'Create match and go to line-ups','Es. Volley Adda':'E.g. Volley Adda','Andata, Ritorno, Playoff…':'First leg, Second leg, Play-off…',
+'Casa':'Home','Ospiti':'Away',
+// formazioni
+'Ruota':'Rotate','Rotazione successiva':'Next rotation','Ruota la formazione: rotazione successiva':'Rotate the line-up: next rotation',
+'Palleggiatore (decide la rotazione e i ruoli)':'Setter (sets the rotation and the roles)',
+'Scegli il palleggiatore: opposto, schiacciatori e centrali si ricavano dalla sua posizione.':'Choose the setter: opposite, outside hitters and middles are worked out from their position.',
+'Palleggiatore:':'Setter:','· Opposto:':'· Opposite:','· Schiacciatori:':'· Outside hitters:','· Centrali:':'· Middles:',
+'Dati partita (per il tabellino)':'Match details (for the score sheet)','Fase':'Stage','Città':'City','Impianto':'Venue','Spettatori':'Spectators','Arbitri':'Referees','MVP':'MVP',
+'Termina la partita':'End the match','Riapri la partita':'Reopen the match',
+'I dati restano salvati su questo dispositivo. Le modifiche alla rosa valgono subito; la formazione si usa all\'avvio del set.':'Data stays saved on this device. Roster changes apply immediately; the line-up is used when the set starts.',
+'Ogni modifica si salva online: apri questa pagina da un altro dispositivo per vedere e continuare la stessa partita. Le modifiche alla rosa valgono subito; la formazione si usa all\'avvio del set.':'Every change is saved online: open this page from another device to see and continue the same match. Roster changes apply immediately; the line-up is used when the set starts.',
+'Chi batte per primo?':'Who serves first?','Inizia al servizio':'Starts serving','Tocca a lei per alternanza':'Their turn by alternation','Torna alle formazioni':'Back to line-ups',
+'Controlla le formazioni di partenza e chi batte per primo, poi avvia il set.':'Check the starting line-ups and who serves first, then start the set.','Vai alle formazioni':'Go to line-ups',
+// scout
+'Battuta':'Serve','Ricezione':'Reception','Alzata':'Set','Attacco':'Attack','Muro':'Block','Difesa':'Dig','Free ball':'Free ball','Deseleziona':'Deselect','Muro o difesa':'Block or dig',
+'Tipo battuta':'Serve type','Flottante':'Float','Salto float':'Jump float','Salto spin':'Jump spin',
+'Ace':'Ace','Positiva':'Positive','Positivo':'Positive','Media':'Average','Facile':'Easy','Rigiocata':'Overpass','Errore':'Error','Perfetta':'Perfect','Staccata':'Off the net',
+'Negativa':'Negative','Negativo':'Negative','Scarsa':'Poor','Buona':'Good','Imprecisa':'Inaccurate','Punto':'Point','Coperto':'Covered','Coperta':'Covered','Murato':'Blocked',
+'Tocco +':'Touch +','Tocco −':'Touch −','Ribattuta':'Rebound','Invasione':'Invasion',
+'Errore / fallo':'Error / fault','Annulla':'Undo','Ultimi codici':'Latest codes','Nessuna azione':'No actions','Azione in corso':'Rally in progress','Ultimo punto':'Last point',
+'⇄ Inverti campo':'⇄ Switch sides','Alzata auto sì':'Auto set on','Alzata auto no':'Auto set off','Zone sì':'Zones on','Zone no':'Zones off',
+'Tocca il giocatore di':'Tap a player of','per il muro o la difesa':'for the block or dig','per la ricezione':'for the reception','per la battuta':'for the serve','per la attacco':'for the attack',
+'per la alzata':'for the set','per la muro':'for the block','per la difesa':'for the dig','per la free ball':'for the free ball',
+'(zona 1)':'(zone 1)','Da dove batte':'Where the serve starts','Dove arriva la palla':'Where the ball lands','Dove cade la palla':'Where the ball lands','Punto di partenza':'Starting point','Zona di battuta':'Serve zone',
+'Errore in battuta':'Service error','Battuta senza zone':'Serve without zones','Rifai la zona di battuta':'Redo the serve zone','Rifai':'Redo',
+'La battuta di':'The serve of','prende la valutazione dalla ricezione':'takes its rating from the reception',
+'Direzione':'Direction','Salva senza arrivo':'Save without landing point','Salva senza zone':'Save without zones','Indietro':'Back',
+'Errore (rete / fuori)':'Error (net / out)','Attacco senza zone':'Attack without zones','Cambia attaccante':'Change attacker','Non è un attacco':'Not an attack',
+'Tocca il punto del campo avversario in cui arriva la palla (anche fuori). Poi sceglierai chi l\'ha toccata, a muro o in difesa, e come. Se attacca da un\'altra zona, tocca prima il punto di partenza nel suo campo.':'Tap the point in the opponent\'s court where the ball lands (out too). Then you will choose who touched it, on the block or in defence, and how. If they attack from another zone, first tap the starting point in their court.',
+'Campo: tocca il punto':'Court: tap the point','Campo: tocca dove arriva l\'attacco':'Court: tap where the attack lands','Torna alla home':'Back to home',
+'Cambio':'Sub','Doppio cambio':'Double sub','Libero':'Libero','Quale libero entra?':'Which libero comes in?','Esce il libero':'Libero out','vuota':'empty',
+'Cambio: tocca chi esce (un subentrato fa rientrare il titolare)':'Sub: tap who goes out (a substitute brings the starter back)',
+'Collega l\'avversario':'Link the opponent','Salta':'Skip','Chi ha sbagliato la ricezione?':'Who missed the reception?','Chi ha murato?':'Who blocked?','Attacco punto: chi c\'era?':'Attack kill: who was there?','Chi non ha difeso?':'Who failed to dig?',
+'Mani-out (muro =)':'Tool (block =)','Tocco negativo (muro −) e non difesa':'Negative touch (block −) and no dig','Non difesa (difesa =)':'No dig (dig =)',
+'Errore generico':'Generic error','Rete':'Net','Doppia':'Double contact','Quattro tocchi':'Four hits','Fallo di posizione':'Position fault','Accompagnata':'Lift','Ritardo':'Delay',
+'Partita conclusa':'Match finished','Chiudi la rilevazione':'Close the scouting','Annulla ultimo punto':'Undo last point','Annulla ultimo':'Undo last','Tabellino PDF':'Score sheet PDF','Play by play PDF':'Play by play PDF',
+'In amichevole la partita resta aperta: a fine di ogni set scegli se giocarne un altro o chiudere.':'In a friendly the match stays open: at the end of each set choose whether to play another or close.',
+'Puoi annullare l\'ultimo punto se è stato inserito per errore.':'You can undo the last point if it was entered by mistake.',
+// statistiche
+'Partita':'Match','Nome':'Name','Pt':'Pts','Prf':'Exc','Pos':'Pos','Eff':'Eff','Err':'Err','Tot':'Tot','Rot.':'Rot.','Cambio palla':'Side-out','Break':'Break',
+'Per rotazione':'By rotation','Per rotazione (P = zona della palleggiatrice)':'By rotation (P = setter zone)','Nessuna azione registrata':'No actions recorded',
+'Errori e falli generici: nessuno':'Generic errors and faults: none','Errori e falli generici:':'Generic errors and faults:',
+'Pos = palloni # e + sul totale. Eff: battuta (# − errori), ricezione (# + − / − errori), attacco e muro (# − / − errori), difesa (# + − errori), sempre sul totale.':'Pos = # and + balls over the total. Eff: serve (# − errors), reception (# + − / − errors), attack and block (# − / − errors), dig (# + − errors), always over the total.',
+'Direzioni':'Directions','Frecce':'Arrows','Heatmap':'Heatmap','Tutti i giocatori':'All players','Mappa direzioni':'Direction map',
+'Più è intenso, più palloni cadono lì. Percentuali sulle palle cadute in campo.':'The more intense, the more balls land there. Percentages on balls landing in court.',
+// codici
+'Report, codici ed export':'Reports, codes and export','Tabellino (PDF)':'Score sheet (PDF)','Play by play (PDF)':'Play by play (PDF)','Copia tutti i codici':'Copy all codes',
+'Esporta Data Volley (.dvw)':'Export Data Volley (.dvw)','Scarica codici (.txt)':'Download codes (.txt)','Backup partita (.json)':'Match backup (.json)','Importa backup':'Import backup','Copia file .dvw':'Copy .dvw file','Nessun codice':'No codes',
+'Nel video, la prima battuta della partita è al minuto (mm:ss o h:mm:ss)':'In the video, the first serve of the match is at minute (mm:ss or h:mm:ss)',
+'Da lì ogni codice prende il suo secondo di video dall\'orario in cui l\'hai registrato, quindi time out e pause restano allineati.':'From there each code takes its video second from the time you recorded it, so time-outs and breaks stay aligned.',
+'Da lì ogni codice prende il suo secondo di video dall\'orario in cui l\'hai registrato, quindi time out e pause restano allineati. Qui dentro Claude i file non si scaricano: usa “Copia file .dvw” e incollalo in un file di testo con estensione .dvw, oppure esporta dalla versione pubblicata.':'From there each code takes its video second from the time you recorded it, so time-outs and breaks stay aligned. Inside Claude files cannot be downloaded: use “Copy .dvw file” and paste it into a text file with the .dvw extension, or export from the published version.',
+'Una riga per azione in sintassi Data Volley: squadra (* casa, a ospiti), numero, fondamentale, tipo, valutazione e, se inserite, zona di partenza e di arrivo. Ogni riga ha l\'orario in cui è stata registrata, per allineare i codici al video. Le righe con p sono i punti, con c i cambi, con T i time out.':'One line per action in Data Volley syntax: team (* home, a away), number, skill, type, rating and, if entered, start and landing zone. Each line has the time it was recorded, to align the codes with the video. Lines with p are points, with c substitutions, with T time-outs.',
+// messaggi
+'Annullato':'Undone','Niente da annullare':'Nothing to undo','Codici copiati':'Codes copied','Testo selezionato: copialo dal menu':'Text selected: copy it from the menu','Testo .dvw selezionato: copialo dal menu':'.dvw text selected: copy it from the menu',
+'File .dvw copiato':'.dvw file copied','File .dvw creato':'.dvw file created','Preparo il PDF…':'Preparing the PDF…','Per creare il PDF serve la connessione la prima volta':'The first time, creating a PDF needs a connection',
+'Errore nella creazione del PDF':'Error creating the PDF','Qui il download non è disponibile':'Download is not available here','Download non riuscito':'Download failed',
+'Partita creata':'Match created','Partita aperta':'Match opened','Partita eliminata':'Match deleted','Partita non trovata':'Match not found','Impossibile aprire la partita, riprova':'Could not open the match, try again',
+'Squadra eliminata':'Team deleted','Scegli entrambe le squadre':'Choose both teams','Casa e ospiti devono essere squadre diverse':'Home and away must be different teams','Scrivi il nome della nuova squadra':'Write the name of the new team',
+'Google Sheets collegato':'Google Sheets connected','Salvataggio online scollegato':'Online saving disconnected','L\'indirizzo deve finire con /exec':'The address must end with /exec',
+'Backup importato':'Backup imported','File non valido: serve un backup .json di Scout Tap':'Invalid file: a Scout Tap .json backup is needed','Aggiornato da un altro dispositivo':'Updated from another device',
+'Spazio online esaurito: elimina vecchie partite':'Online storage full: delete old matches','Memoria del dispositivo piena: collega il salvataggio online o elimina vecchie partite':'Device storage full: connect online saving or delete old matches',
+'Rilevazione chiusa: la partita è in Partite e statistiche':'Scouting closed: the match is in Matches and statistics','Partita conclusa: la trovi in Partite e statistiche':'Match finished: you will find it in Matches and statistics','Partita riaperta':'Match reopened',
+'Completa prima i sei in campo':'First complete the six on court','Tocca prima il giocatore':'Tap the player first','Tocca il giocatore che riceve':'Tap the receiving player',
+'Tocca chi ha toccato la palla dall\'altra parte (muro o difesa)':'Tap who touched the ball on the other side (block or dig)',
+'Prima tocca la fascia di battuta dietro il campo di chi batte':'First tap the serve zone next to the serving team\'s court','Tocca la fascia di battuta dietro il campo di chi batte':'Tap the serve zone next to the serving team\'s court',
+'Partenza spostata':'Start point moved','Prima il punto di partenza, nel campo di chi gioca':'First the starting point, in the playing team\'s court','Scegli il fondamentale e poi la valutazione':'Choose the skill and then the rating',
+'Nuova partita: rose mantenute, scegli le formazioni':'New match: rosters kept, choose the line-ups',
+'Il libero entra solo in seconda linea (zone 1, 5, 6)':'The libero only comes in for the back row (zones 1, 5, 6)','Il libero non può battere':'The libero cannot serve','Il libero non può murare':'The libero cannot block','Il libero è già lì':'The libero is already there',
+'Per il libero usa il bottone Libero':'For the libero use the Libero button','Il libero entra solo con il bottone Libero':'The libero only comes in with the Libero button','Nessun libero in rosa: segna il ruolo L in Squadre':'No libero in the roster: mark the L role in Teams',
+'Scegli prima quale libero entra':'First choose which libero comes in','Tocca un giocatore della squadra del libero':'Tap a player of the libero\'s team','Tocca un giocatore della squadra che fa il cambio':'Tap a player of the team making the sub',
+'Prima tocca in campo chi esce':'First tap on court who goes out','Tocca la panchina della squadra che fa il doppio cambio':'Tap the bench of the team making the double sub',
+'Uno dei due è già un subentrato: usa il Cambio singolo':'One of the two is already a substitute: use the single Sub','Fai prima uscire il libero':'Take the libero out first','Prima indica il palleggiatore nella formazione':'First set the setter in the line-up',
+'In campo servono un palleggiatore (S) e un opposto (O)':'A setter (S) and an opposite (O) are needed on court',
+// accesso
+'Richiedi l\'accesso':'Request access','Scout Tap si usa solo con l\'autorizzazione del responsabile. Compila i dati: riceverà la richiesta e, quando la approva, l\'app si sblocca su questo dispositivo.':'Scout Tap can only be used with the manager\'s authorisation. Fill in your details: the manager will receive the request and, once approved, the app unlocks on this device.',
+'Nome e cognome':'Full name','Staff / squadra':'Staff / team','Email (facoltativa)':'Email (optional)','Richiedi accesso':'Request access','Es. Under 17 femminile':'E.g. Women\'s Under 17',
+'Richiesta in attesa':'Request pending','Controlla di nuovo':'Check again','Accesso non autorizzato':'Access not authorised','Verifica dell\'accesso':'Access check','Verifica ora':'Check now',
+'Questo dispositivo non è autorizzato a usare Scout Tap, oppure l\'accesso è stato revocato. Per informazioni contatta il responsabile.':'This device is not authorised to use Scout Tap, or access has been revoked. Contact the manager for information.',
+'Sono passati più di 7 giorni dall\'ultimo controllo. Collegati a internet per verificare che l\'accesso sia ancora attivo.':'More than 7 days have passed since the last check. Connect to the internet to verify that access is still active.',
+'Controllo in corso…':'Checking…','Nessuna connessione: riprova quando sei online.':'No connection: try again when you are online.','Codice dispositivo:':'Device code:',
+'Accesso':'Access','Scrivi nome e staff':'Enter name and staff','Accesso autorizzato':'Access authorised','Richiesta inviata':'Request sent','Richiesta non riuscita: controlla la connessione':'Request failed: check the connection',
+'La richiesta di':'The request from','per lo staff':'for the staff',"è stata inviata. Quando il responsabile la approva, l'app si sblocca da sola su questo dispositivo.":'has been sent. When the manager approves it, the app unlocks by itself on this device.',
+'staff':'staff','· staff':'· staff',"· autorizzato. Partite e squadre si salvano nel foglio dello staff e gli altri dispositivi autorizzati dello stesso staff si aggiornano da soli.":'· authorised. Matches and teams are saved in the staff\'s sheet and the other authorised devices of the same staff update by themselves.',
+// PDF
+'Tabellino':'Score sheet','Play by play':'Play by play','Data':'Date','Orario':'Time','Durata':'Duration','Finali':'Final','Totale':'Total','Punti':'Points','Falli':'Faults',
+'Totali squadra':'Team totals','Punti vinti':'Points won','Bat':'Srv','Mur':'Blk','Er.Av':'Opp.Err','V-P':'W-L','Prf%':'Exc%','Nessun punto in cambio palla':'No side-out points','Nessun break point':'No break points',
+'CAMBIO PALLA DIRETTO':'FIRST-BALL SIDE-OUT','Attacco dopo ricezione positiva':'Attack after positive reception','Attacco dopo ricezione negativa':'Attack after negative reception','Contrattacco':'Transition attack',
+'Punteggio':'Score','Batte':'Server','Come è finita':'How it ended','Punto a':'Point to','Punto assegnato':'Point awarded',
+'BP break point · V-P punti vinti meno errori · Pos% positive (#,+) · Prf% perfette (#) · Eff% efficienza · Er.Av errori avversari · CP cambio palla · cerchio: zona di partenza nel set · trattino: entrato':'BP break point · W-L points won minus errors · Pos% positive (#,+) · Exc% perfect (#) · Eff% efficiency · Opp.Err opponent errors · CP side-out · circle: starting zone in the set · dash: came in',
+};
+const SKW={ricezione:'reception',battuta:'serve',attacco:'attack',alzata:'set',muro:'block',difesa:'dig','free ball':'free ball'};
+const TR_RULES=[
+[/^Punto (.+)$/,'Point $1'],[/^Errore \/ fallo (.+)$/,'Error / fault $1'],[/^Time out (.+) · (\d)\/2$/,'Time-out $1 · $2/2'],
+[/^(.+) · cambi (\d+\/\d+)(?: · libero (\d+) per (\d+))?$/,(m,a,b,c,d)=>`${a} · subs ${b}${c?` · libero ${c} for ${d}`:''}`],
+[/^Set (\d+) in corso$/,'Set $1 in progress'],[/^Set (\d+): formazioni$/,'Set $1: line-ups'],[/^Formazioni pronte: inizia il set (\d+)$/,'Line-ups ready: start set $1'],
+[/^Formazione di partenza set (\d+) · rete in alto$/,'Starting line-up set $1 · net at the top'],[/^Fine set (\d+)$/,'End of set $1'],[/^Set (\d+) non ancora iniziato$/,'Set $1 not started yet'],
+[/^Set (\d+) · tie-break: dopo il sorteggio$/,'Set $1 · tie-break: after the toss'],
+[/^Amichevole · Set (\d+)$/,'Friendly · Set $1'],[/^Amichevole · (.+) nei set$/,'Friendly · $1 in sets'],[/^Amichevole: gioca il set (\d+)$/,'Friendly: play set $1'],
+[/^(.+) vince (.+)$/,'$1 wins $2'],[/^(\d+) squadre salvate$/,'$1 saved teams'],[/^(\d+) giocatori(?: · (\d+) liberi)?$/,(m,a,b)=>`${a} players${b?` · ${b} liberos`:''}`],
+[/^(\d+) righe$/,'$1 lines'],[/^(\d+) partite · (\d+) concluse$/,'$1 matches · $2 finished'],[/^(.+) attacca$/,'$1 attacks'],[/^(.+) batte$/,'$1 serves'],
+[/^(\d+) (attacchi|battute) con direzione(?: · (\d+) senza arrivo registrato)?\. Tocca di nuovo un filtro per toglierlo\.$/,(m,n,k,x)=>`${n} ${k==='attacchi'?'attacks':'serves'} with direction${x?` · ${x} without landing point`:''}. Tap a filter again to remove it.`],
+[/^zona (\d) · (\d+)$/,'zone $1 · $2'],[/^fuori: (\d+)$/,'out: $1'],[/^· zona (.+)$/,'· zone $1'],[/^da zona (\d)$/,'from zone $1'],
+[/^(Battuta|Attacco) · (\d) di (\d)$/,(m,a,b,c)=>`${a==='Battuta'?'Serve':'Attack'} · ${b} of ${c}`],
+[/^Allenatore: (.*)$/,'Coach: $1'],[/^Assistente: (.*)$/,'Assistant: $1'],[/^Time out: (.*)$/,'Time-outs: $1'],[/^Allenatore (.+)$/,'Coach $1'],[/^Assistente (.+)$/,'Assistant $1'],
+[/^Ace di (\d+)\. Tocca il giocatore di (.+) che ha sbagliato \(anche il libero in panchina\): diventa ricezione =\.$/,'Ace by $1. Tap the $2 player who missed the reception (the libero on the bench too): it becomes reception =.'],
+[/^Attacco di (\d+) murato\. Tocca il giocatore di (.+) che ha murato: diventa muro #\.$/,'Attack by $1 blocked. Tap the $2 player who blocked: it becomes block #.'],
+[/^Giocatore (\d+) di (.+): com'è finito l'attacco\?$/,'Player $1 of $2: how did the attack end?'],
+[/^Tocca il giocatore di (.+) che ha toccato la palla \(a muro o in difesa\), oppure salta\.$/,'Tap the $1 player who touched the ball (block or dig), or skip.'],
+[/^Tocco a muro negativo di (\d+)\. Tocca il giocatore di (.+) che non ha difeso \(anche il libero in panchina\): diventa difesa =\. Oppure salta\.$/,'Negative block touch by $1. Tap the $2 player who failed to dig (the libero on the bench too): it becomes dig =. Or skip.'],
+[/^Il punto va a (.+)\. Scegli il tipo:$/,'The point goes to $1. Choose the type:'],
+[/^Battuta da zona (\d)\. Tocca il punto del campo avversario in cui arriva la palla \(anche fuori\)\. Poi sceglierai chi riceve e come\.$/,'Serve from zone $1. Tap the point in the opponent\'s court where the ball lands (out too). Then you will choose who receives and how.'],
+[/^Partenza da zona (\d)\. Tocca il punto esatto in cui cade la palla nel campo avversario, anche fuori dalle linee\.$/,'Start from zone $1. Tap the exact point where the ball lands in the opponent\'s court, outside the lines too.'],
+[/^Tocca il punto da cui parte l'attacco nel campo di (.+)\.$/,'Tap the point where the attack starts in the $1 court.'],
+[/^Tocca la zona di battuta \(5 7 6 9 1\) accanto al campo di (.+)\. Per fare prima, tocca direttamente chi riceve: la battuta si valuta dalla ricezione\.$/,'Tap the serve zone (5 7 6 9 1) next to the $1 court. To go faster, tap the receiver directly: the serve is rated from the reception.'],
+[/^Doppio cambio: chi entra come palleggiatore \(al posto di (\d+)\)\?$/,'Double sub: who comes in as setter (for $1)?'],
+[/^Palleggiatore (\d+)\. Chi entra come opposto \(al posto di (\d+)\)\?$/,'Setter $1. Who comes in as opposite (for $2)?'],
+[/^Entra al posto del (\d+):$/,'Comes in for $1:'],[/^Libero (\d+): tocca in campo il giocatore di seconda linea$/,'Libero $1: tap the back-row player on court'],
+[/^⇄ Inverti campo: (.+) a sinistra$/,'⇄ Switch sides: $1 on the left'],[/^Zona (\d)$/,'Zone $1'],
+[/^([HMQ]) (Flottante|Salto float|Salto spin)$/,(m,a,b)=>`${a} ${TR_EXACT[b]}`],[/^([#+!\-\/=]) (.+)$/,(m,a,b)=>`${a} ${TR_EXACT[b]||b}`],
+[/^(.+) ha già chiamato 2 time out in questo set$/,'$1 has already called 2 time-outs this set'],
+[/^(\d+) è già uscito e rientrato in questo set$/,'$1 has already gone out and come back in this set'],[/^(\d+) può uscire solo per far rientrare (\d+)$/,'$1 can only go out to bring $2 back in'],
+[/^(\d+) ha già fatto un cambio in questo set$/,'$1 has already been substituted this set'],[/^(\d+) è fuori per il libero: prima fai uscire il libero$/,'$1 is out for the libero: take the libero out first'],
+[/^Limite di (\d+) cambi raggiunto in questo set$/,'Limit of $1 substitutions reached this set'],[/^Amichevole: imposta la formazione del set (\d+)$/,'Friendly: set the line-up for set $1'],
+[/^Cambi insufficienti: (.+)$/,'Not enough substitutions: $1'],[/^Cambio (\d+\/\d+): entra (\d+), esce (\d+)$/,'Sub $1: $2 in, $3 out'],[/^Cambio libero: entra (\d+), esce (\d+)$/,'Libero change: $1 in, $2 out'],
+[/^Collegamento non riuscito: (.+)$/,(m,a)=>'Connection failed: '+(a==='chiave sbagliata'?'wrong key':'check the address and the script deployment')],
+[/^Doppio cambio: (\d+) palleggia al posto di (\d+), (\d+) opposto al posto di (\d+) · (.+)$/,'Double sub: $1 sets for $2, $3 plays opposite for $4 · $5'],
+[/^Rientrano (\d+) in regia e (\d+) opposto · cambi (.+)$/,'$1 back as setter and $2 as opposite · subs $3'],
+[/^Entra il libero (\d+) al posto di (\d+)$/,'Libero $1 in for $2'],[/^Esce il libero (\d+), rientra (\d+)$/,'Libero $1 out, $2 back in'],[/^Il libero (\d+) va in prima linea: rientra (\d+)$/,'Libero $1 rotates to the front row: $2 back in'],
+[/^Ora (.+) è a sinistra$/,'$1 is now on the left'],[/^Registrato (.+)$/,'Recorded $1'],[/^Time out (.+) \((\d)\/2\) · (.+)$/,'Time-out $1 ($2/2) · $3'],
+[/^Tocca un giocatore di (.+)$/,'Tap a player of $1'],[/^(.+): ora in P(\d)$/,'$1: now in P$2'],[/^(.+): formazione ruotata$/,'$1: line-up rotated'],
+[/^Formazione (.+): servono 6 giocatori diversi$/,'Line-up $1: 6 different players are needed'],[/^Formazione (.+): il libero non va nei sei di partenza$/,'Line-up $1: the libero is not one of the starting six'],
+[/^Formazione (.+): scegli il palleggiatore$/,'Line-up $1: choose the setter'],
+[/^In panchina serve un palleggiatore \(S\) e un opposto \(O\) disponibili$/,'An available setter (S) and opposite (O) are needed on the bench'],
+[/^(Errore generico|Rete|Invasione|Doppia|Quattro tocchi|Fallo di posizione|Accompagnata|Ritardo): punto (.+)$/,(m,a,b)=>`${TR_EXACT[a]}: point ${b}`],
+[/^Cambio (.+): esce (.+), entra (.+)$/,'Sub $1: $2 out, $3 in'],[/^Time out (.+)$/,'Time-out $1'],
+[/^Cambi (.+) \(esce>entra\)$/,'Subs $1 (out>in)'],[/^Cambi (.+)$/,'Subs $1'],
+[/^Ricezioni (\d+)$/,'Receptions $1'],[/^Punti CP (\d+)$/,'Side-out points $1'],[/^Battute (\d+)$/,'Serves $1'],[/^Punti BP (\d+)$/,'Break points $1'],
+[/^Ogni (.+) ricezioni 1 punto \((.+)\)$/,'1 point every $1 receptions ($2)'],[/^Ogni (.+) battute 1 break point \((.+)\)$/,'1 break point every $1 serves ($2)'],
+[/^Pagina (\d+) di (\d+)$/,'Page $1 of $2'],[/^(.+) \(L\)$/,'$1 (L)'],
+[/^(.*?)(?: · )?(in corso|conclusa)$/,(m,a,b)=>`${a.replace('nessun set','no sets')}${a?' · ':''}${b==='in corso'?'in progress':'finished'}`],
+[/^(.+):$/,(m,a)=>TR_EXACT[a]?TR_EXACT[a]+':':m],
+];
+const TR_PHRASES=[
+[/\(finita\)/g,'(finished)'],[/ \(in corso\)/g,' (in progress)'],[/\bdurata\b/g,'duration'],[/\bparziali\b/g,'partials'],[/nessun set/g,'no sets'],
+[/Errore a muro \(mani-out\)/g,'Block error (tool)'],[/Errore in battuta/g,'Service error'],[/Errore in ricezione/g,'Reception error'],[/Errore in attacco/g,'Attack error'],[/Errore in alzata/g,'Setting error'],
+[/Errore free ball/g,'Free ball error'],[/Attacco punto/g,'Attack kill'],[/Attacco murato/g,'Attack blocked'],[/Muro punto/g,'Block point'],[/Invasione a muro/g,'Block net touch'],[/Difesa non riuscita/g,'Dig error'],
+[/, muro di /g,', blocked by '],[/\bmani-out\b/g,'tool'],[/tocco a muro/g,'block touch'],[/non difesa/g,'no dig'],[/ su (\d)/g,' on $1'],
+[/Errore generico/g,'Generic error'],[/Fallo di posizione/g,'Position fault'],[/Quattro tocchi/g,'Four hits'],[/\bAccompagnata\b/g,'Lift'],[/\bRitardo\b/g,'Delay'],[/\bDoppia\b/g,'Double contact'],[/\bInvasione\b/g,'Invasion'],[/\bRete\b/g,'Net'],
+[/\bBattuta\b/g,'Serve'],[/\bRicezione\b/g,'Reception'],[/\bAttacco\b/g,'Attack'],[/\bMuro\b/g,'Block'],[/\bDifesa\b/g,'Dig'],[/\bAlzata\b/g,'Set'],
+];
+function tr(t){
+  if(LANG!=='en'||t==null||typeof t!=='string')return t;
+  const k=t.trim();if(!k)return t;
+  const lead=t.slice(0,t.indexOf(k[0])),trail=t.slice(t.lastIndexOf(k[k.length-1])+1);
+  let r=TR_EXACT[k];
+  if(r==null)for(const[re,rep] of TR_RULES){if(re.test(k)){r=k.replace(re,rep);break}}
+  if(r==null){r=k;for(const[re,rep] of TR_PHRASES)r=r.replace(re,rep)}
+  return lead+r+trail;
+}
+function trDom(root){
+  if(LANG!=='en'||!root)return;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;const todo=[];
+  while(n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('textarea,pre,.code,.ln,.notr'))continue;if(/[A-Za-zÀ-ù]{2}/.test(n.nodeValue))todo.push(n)}
+  todo.forEach(n=>{const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v});
+  root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(e=>['placeholder','aria-label','title'].forEach(a=>{const v=e.getAttribute(a);if(v&&!/^\d/.test(v)){const t2=tr(v);if(t2!==v)e.setAttribute(a,t2)}}));
+}
+function deepTr(v){
+  if(LANG!=='en')return v;
+  if(typeof v==='string')return tr(v);
+  if(Array.isArray(v))return v.map(deepTr);
+  if(v&&typeof v==='object'&&'content' in v)return{...v,content:deepTr(v.content)};
+  return v;
+}
+function trDoc(doc){
+  if(LANG!=='en')return doc;
+  const tx=doc.text.bind(doc);doc.text=(t,...a)=>tx(deepTr(t),...a);
+  const at=doc.autoTable.bind(doc);doc.autoTable=o=>at({...o,head:deepTr(o.head),body:deepTr(o.body)});
+  return doc;
+}
+function setLang(l){
+  LANG=l==='en'?'en':'it';try{localStorage.setItem(KEY+'.lang',LANG)}catch(e){}
+  document.documentElement.lang=LANG;render();
+}
+
 const SKILLS=[['S','Battuta'],['R','Ricezione'],['E','Alzata'],['A','Attacco'],['B','Muro'],['D','Difesa'],['F','Free ball']];
 const SKN=Object.fromEntries(SKILLS);
 const EVS=['#','+','!','-','/','='];
@@ -350,7 +570,7 @@ function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):nul
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function save(){S.updatedAt=Date.now();S.dev=DEV;saveLocal();queueSync();archPut()}
 function snap(){hist.push(JSON.stringify(S));if(hist.length>200)hist.shift()}
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,1800)}
+function toast(m){const t=document.getElementById('toast');t.textContent=tr(m);t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,1800)}
 
 function parseRoster(txt){
   return txt.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
@@ -373,6 +593,9 @@ function setterIdx(t){
   if(i<0&&L&&L.rep==sn)i=S.lineup[t].findIndex(x=>x==L.num);
   return i;
 }
+// sigle mostrate: palleggiatore S, schiacciatore OH, centrale MB, opposto O, libero L
+const RLBL={P:'S',S:'OH',C:'MB',O:'O',L:'L'};
+const roleLbl=(t,n)=>RLBL[roleOf(t,n)]||'';
 function roleOf(t,n){
   if(isLib(t,n))return'L';
   const i=S.lineup[t].findIndex(x=>x==n);if(i<0)return'';
@@ -593,8 +816,10 @@ function nextSet(){snap();S.finished=false;S.set++;S.score={h:0,a:0};S.setOver=n
 
 
 /* ---------- rendering ---------- */
-function render(){
+function render(){renderRaw();trDom(document.getElementById('app'))}
+function renderRaw(){
   const app=document.getElementById('app');
+  const gs=gateState();if(gs){app.innerHTML=viewGate(gs);return}
   let body='';
   const outer={home:viewHome,teams:viewTeams,newmatch:viewNewMatch,archive:viewArchive}[S.view];
   if(outer){app.innerHTML=homeHeader({home:'',teams:'Squadre',newmatch:'Nuova partita',archive:'Archivio'}[S.view])+outer();return}
@@ -657,9 +882,9 @@ function courtHTML(){
     const out=S.subMode&&S.subMode.team===t&&S.subMode.out==n;
     const ball=!S.rally.length&&t===S.serving&&z==1;
     const isL=S.lib&&S.lib[t]&&S.lib[t].num==n,sub=!!openPairOf(t,n);
-    if(sp){const q=sp[z-1];orbs+=`<button class="orb ${t} ${on?'on':''} ${out?'out':''} ${isL?'isl':''}" style="left:calc(8px + ${q.px}*(100% - 16px));top:calc(8px + ${q.py}*(100% - 16px))" data-act="player" data-t="${t}" data-n="${n}" aria-label="${n} ${esc(p.name)}"><span class="num">${n}</span><span class="rl">${roleOf(t,n)}</span></button>`;continue}
+    if(sp){const q=sp[z-1];orbs+=`<button class="orb ${t} ${on?'on':''} ${out?'out':''} ${isL?'isl':''}" style="left:calc(8px + ${q.px}*(100% - 16px));top:calc(8px + ${q.py}*(100% - 16px))" data-act="player" data-t="${t}" data-n="${n}" aria-label="${n} ${esc(p.name)}"><span class="num">${n}</span><span class="rl">${roleLbl(t,n)}</span></button>`;continue}
     cells+=`<button class="chip ${t} ${on?'on':''} ${out?'out':''} ${isL?'isl':''} ${sub?'issub':''}" style="grid-column:${c};grid-row:${r}" data-act="player" data-t="${t}" data-n="${n}">
-      ${roleOf(t,n)?`<span class="role">${roleOf(t,n)}</span>`:''}${ball?'<span class="ball"></span>':''}
+      ${roleLbl(t,n)?`<span class="role">${roleLbl(t,n)}</span>`:''}${ball?'<span class="ball"></span>':''}
       <span class="num">${n}</span><span class="nm">${esc(p.name)}</span><span class="zn">${z}</span></button>`;
   }
   }
@@ -675,7 +900,10 @@ function courtHTML(){
 function phaseOf(t){
   if(!S.started||setterIdx(t)<0)return'rot';
   const r=S.rally;
-  if(!r.length)return t===S.serving?'rot':'recv';
+  // dopo un punto in attacco o a muro: chi ha toccato si sceglie dalle posizioni di gioco (prima e seconda linea)
+  if(S.link&&t===S.link.team)return S.link.kind==='R'?'recv':'spec';
+  // chi batte, prima della battuta: prima linea già nelle posizioni di gioco, seconda linea in ordine di rotazione (battitore in 1)
+  if(!r.length)return t===S.serving?'pre':'recv';
   if(t===S.serving)return'spec';
   return r.some(a=>a.team===t)?'spec':'recv';
 }
@@ -684,7 +912,9 @@ function dispZones(t){
   if(ph==='rot')return def;
   const si=setterIdx(t),seat=i=>SEATS[(i-si+6)%6],front=i=>i>=1&&i<=3;
   // dopo la battuta: P e O in 1 o 2, C in 3 o 5, S in 4 o 6
-  if(ph==='spec')return def.map((_,i)=>{const r=seat(i),f=front(i);return r==='C'?(f?3:5):r==='S'?(f?4:6):(f?2:1)});
+  const spec=i=>{const r=seat(i),f=front(i);return r==='C'?(f?3:5):r==='S'?(f?4:6):(f?2:1)};
+  if(ph==='spec')return def.map((_,i)=>spec(i));
+  if(ph==='pre')return def.map((z,i)=>front(i)?spec(i):z);
   // ricezione: schiacciatori e libero (o centrale di seconda linea) in linea dietro, gli altri a rete, da sinistra a destra
   const LAT=[2,2,1,0,0,1],recv=[],non=[];
   for(let i=0;i<6;i++){const r=seat(i);(r==='S'||(r==='C'&&!front(i))?recv:non).push(i)}
@@ -752,12 +982,14 @@ function padFault(){
 }
 function padLink(){
   const L=S.link,tn=esc(S.teams[L.team].name);
-  const t={R:`Chi ha sbagliato la ricezione?`,B:`Chi ha murato?`,AD:`Attacco punto: chi c'era?`}[L.kind];
+  const t={R:`Chi ha sbagliato la ricezione?`,B:`Chi ha murato?`,AD:`Attacco punto: chi c'era?`,ND:`Chi non ha difeso?`}[L.kind];
   const d={R:`Ace di ${L.src.num}. Tocca il giocatore di ${tn} che ha sbagliato (anche il libero in panchina): diventa ricezione =.`,
     B:`Attacco di ${L.src.num} murato. Tocca il giocatore di ${tn} che ha murato: diventa muro #.`,
-    AD:L.num?`Giocatore ${L.num} di ${tn}: com'è finito l'attacco?`:`Tocca il giocatore di ${tn} che ha toccato la palla, oppure salta.`}[L.kind];
+    AD:L.num?`Giocatore ${L.num} di ${tn}: com'è finito l'attacco?`:`Tocca il giocatore di ${tn} che ha toccato la palla (a muro o in difesa), oppure salta.`,
+    ND:`Tocco a muro negativo di ${L.src.num}. Tocca il giocatore di ${tn} che non ha difeso (anche il libero in panchina): diventa difesa =. Oppure salta.`}[L.kind];
   return `<div class="panel-big"><span class="lbl">Collega l'avversario</span><h2>${t}</h2><p class="note">${d}</p>
-  ${L.kind==='AD'&&L.num?`<div class="row"><button class="btn" data-act="linkad" data-k="B">Mani-out (muro =)</button><button class="btn" data-act="linkad" data-k="D">Non difesa (difesa =)</button></div>`:''}
+  ${L.kind==='AD'&&L.num?`<span class="lbl">Muro</span><div class="row"><button class="btn" data-act="linkad" data-k="B">Mani-out (muro =)</button><button class="btn" data-act="linkbm">Tocco negativo (muro −) e non difesa</button></div>
+  <span class="lbl">Difesa</span><div class="row"><button class="btn" data-act="linkad" data-k="D">Non difesa (difesa =)</button></div>`:''}
   <button class="btn ghost" data-act="linkskip">Salta</button></div>`;
 }
 function padSetOver(){
@@ -936,7 +1168,7 @@ function mapHTML(all){
   <div class="legend">${leg}</div>
   <p class="note">${pts.length} ${m.sk==='S'?'battute':'attacchi'} con direzione${acts.length>pts.length?` · ${acts.length-pts.length} senza arrivo registrato`:''}. Tocca di nuovo un filtro per toglierlo.</p></div>`;
 }
-const hms=ms=>ms?new Date(ms).toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'--:--:--';
+const hms=ms=>ms?new Date(ms).toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'--:--:--';
 function codeText(){return S.lines.map((c,i)=>`${hms((S.ltimes||[])[i])}\t${c}`).join('\n')}
 /* ---------- export Data Volley (.dvw) ---------- */
 function parseClock(v){const p=String(v||'0').trim().split(':').map(Number);if(p.some(isNaN))return 0;return p.reduce((a,x)=>a*60+x,0)}
@@ -1115,7 +1347,9 @@ function rallyText(r){
   if(e.sk==='&')return`${e.reason||'Errore generico'} (${S.teams[e.team].name})`;
   let s=`${ENDTXT[e.sk+e.ev]||SKN[e.sk]} ${pname(e.team,e.num)}`;
   if(e.sk==='A'&&e.ev==='/'&&r.scorer)s+=`, muro di ${pname(r.scorer.team,r.scorer.num)}`;
-  if(e.sk==='A'&&e.ev==='#'){const l=r.acts.find(x=>x.linked&&x.team!==e.team);if(l)s+=l.sk==='B'?` (mani-out ${pname(l.team,l.num)})`:` (non difesa ${pname(l.team,l.num)})`}
+  if(e.sk==='A'&&e.ev==='#'){const ls=r.acts.filter(x=>x.linked&&x.team!==e.team),bl=ls.find(x=>x.sk==='B'),df=ls.find(x=>x.sk==='D');
+    const parts=[];if(bl)parts.push(bl.ev==='='?`mani-out ${pname(bl.team,bl.num)}`:`tocco a muro ${pname(bl.team,bl.num)}`);if(df)parts.push(`non difesa ${pname(df.team,df.num)}`);
+    if(parts.length)s+=` (${parts.join(', ')})`}
   if(e.sk==='S'&&e.ev==='#'){const l=r.acts.find(x=>x.linked&&x.sk==='R');if(l)s+=` su ${pname(l.team,l.num)}`}
   if(e.ez&&(e.sk==='A'||e.sk==='S'))s+=` · z${e.sz}>${e.ez}`;
   return s;
@@ -1140,7 +1374,7 @@ function pdfHeader(doc,title){
   doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...PDFC.ink);doc.text('Scout Tap',27,13);
   doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...PDFC.muted);doc.text(L1(title),27,17.5);
   const info=S.info||{};const d=new Date(S.ltimes.find(Boolean)||Date.now());
-  doc.setFontSize(8.5);doc.text(L1(`${d.toLocaleDateString('it-IT')}  ${d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}${info.fase?'  ·  '+info.fase:''}`),W-12,15,{align:'right'});
+  doc.setFontSize(8.5);doc.text(L1(`${d.toLocaleDateString(LOC())}  ${d.toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})}${info.fase?'  ·  '+info.fase:''}`),W-12,15,{align:'right'});
   doc.setDrawColor(...PDFC.line);doc.line(12,21,W-12,21);
 }
 function pdfFooter(doc){
@@ -1150,7 +1384,7 @@ function pdfFooter(doc){
 }
 async function buildTabellino(){
   const jsPDF=await pdfLib();const R=report();const info=S.info||{};
-  const doc=new jsPDF({unit:'mm',format:'a4'});const W=doc.internal.pageSize.getWidth(),M=10;
+  const doc=trDoc(new jsPDF({unit:'mm',format:'a4'}));const W=doc.internal.pageSize.getWidth(),M=10;
   pdfHeader(doc,'Tabellino');
   // squadre e set vinti
   let y=24;
@@ -1161,7 +1395,7 @@ async function buildTabellino(){
   // dati incontro
   const d=new Date(S.ltimes.find(Boolean)||Date.now());
   doc.setLineWidth(.2);doc.rect(112,y,W-M-112,15);doc.setFontSize(7.5);doc.setFont('helvetica','normal');
-  const kv=[['Data',d.toLocaleDateString('it-IT')],['Orario',d.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})],['Città',info.citta||''],['Impianto',info.impianto||''],['Spettatori',info.spettatori||''],['MVP',info.mvp||''],['Arbitri',info.arbitri||''],['Fase',info.fase||'']];
+  const kv=[['Data',d.toLocaleDateString(LOC())],['Orario',d.toLocaleTimeString(LOC(),{hour:'2-digit',minute:'2-digit'})],['Città',info.citta||''],['Impianto',info.impianto||''],['Spettatori',info.spettatori||''],['MVP',info.mvp||''],['Arbitri',info.arbitri||''],['Fase',info.fase||'']];
   kv.forEach(([k,v],i)=>{const cx=114+(i%2)*44,cy=y+4+Math.floor(i/2)*3.4;doc.setTextColor(...PDFC.muted);doc.text(L1(k+':'),cx,cy);doc.setTextColor(...PDFC.ink);doc.text(L1(v),cx+14,cy,{maxWidth:29})});
   y+=17;
   // tabella set
@@ -1260,7 +1494,7 @@ function summaryBlock(doc,R,y){
 }
 async function buildPlayByPlay(){
   const jsPDF=await pdfLib();const R=report();
-  const doc=new jsPDF({unit:'mm',format:'a4'});const W=doc.internal.pageSize.getWidth(),M=12;
+  const doc=trDoc(new jsPDF({unit:'mm',format:'a4'}));const W=doc.internal.pageSize.getWidth(),M=12;
   pdfHeader(doc,'Play by play');
   let y=30;
   doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(...PDFC.home);doc.text(L1(S.teams.h.name),M,y);
@@ -1380,6 +1614,7 @@ document.addEventListener('click',e=>{
         if(S.link.team!==t){toast(`Tocca un giocatore di ${S.teams[S.link.team].name}`);return}
         if(S.link.kind==='R'){recordLink(t,n,'R','=');break}
         if(S.link.kind==='B'){recordLink(t,n,'B','#');break}
+        if(S.link.kind==='ND'){recordLink(t,n,'D','=');break}
         S.link.num=n;break;
       }
       if(S.libMode){
@@ -1407,6 +1642,7 @@ document.addEventListener('click',e=>{
         if(S.link.team!==t){toast(`Tocca un giocatore di ${S.teams[S.link.team].name}`);return}
         if(S.link.kind==='R'){recordLink(t,n,'R','=');break}
         if(S.link.kind==='AD'){S.link.num=n;break}
+        if(S.link.kind==='ND'){recordLink(t,n,'D','=');break}
         toast('Il libero non può murare');return;
       }
       if(S.dblMode){if(S.dblMode.team!==t){toast('Tocca la panchina della squadra che fa il doppio cambio');return}dblPick(t,n);break}
@@ -1436,6 +1672,9 @@ document.addEventListener('click',e=>{
     case 'srvskip':S.srv={skip:true};predict();break;
     case 'srvback':S.srv=null;predict();break;
     case 'swap':S.swap=!S.swap;toast(`Ora ${S.teams[sides()[0]].name} è a sinistra`);break;
+    case 'lang':setLang(b.dataset.v);return;
+    case 'authreq':authRequest();return;
+    case 'authcheck':authMsg='';authCheck();return;
     case 'listm':listMatches();return;
     case 'resume':{const r=resumable();if(!r)return;if(r.current){S.view=S.started?'scout':'setup';break}openAny(r.id,'scout');return;}
     case 'openx':openAny(b.dataset.id,b.dataset.v);return;
@@ -1509,11 +1748,13 @@ document.addEventListener('click',e=>{
     case 'undo':if(!hist.length){toast('Niente da annullare');return}S=JSON.parse(hist.pop());S.confirmReset=false;toast('Annullato');break;
     case 'linkskip':S.link=null;break;
     case 'linkad':{const L=S.link;if(!L||!L.num)return;recordLink(L.team,L.num,b.dataset.k,'=');break}
+    case 'linkbm':{const L=S.link;if(!L||!L.num)return;recordLink(L.team,L.num,'B','-');const bk=S.actions[S.actions.length-1];
+      S.link={kind:'ND',team:L.team,src:bk,num:null};break}
     case 'timeout':{
       if(!S.timeouts)S.timeouts={h:0,a:0};
       if(S.timeouts[t]>=2){toast(`${S.teams[t].name} ha già chiamato 2 time out in questo set`);return}
       snap();S.timeouts[t]++;addLine(`${tc(t)}T`);
-      toast(`Time out ${S.teams[t].name} (${S.timeouts[t]}/2) · ${new Date().toLocaleTimeString('it-IT')}`);break;}
+      toast(`Time out ${S.teams[t].name} (${S.timeouts[t]}/2) · ${new Date().toLocaleTimeString(LOC())}`);break;}
     case 'sub':S.subMode=S.subMode&&S.subMode.team===t?null:{team:t,out:null};S.libMode=null;S.dblMode=null;break;
     case 'dbl':S.subMode=null;S.libMode=null;if(S.dblMode&&S.dblMode.team===t){S.dblMode=null;break}dblStart(t);break;
     case 'lib':{
@@ -1671,9 +1912,10 @@ function homeHeader(title){
 }
 function viewHome(){
   const r=resumable(),all=allMatches(),done=all.filter(isFinished).length;
-  const fdate=m=>matchDate(m)?new Date(matchDate(m)).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+  const fdate=m=>matchDate(m)?new Date(matchDate(m)).toLocaleDateString(LOC(),{day:'2-digit',month:'2-digit',year:'numeric'}):'';
   const cfg=!IN_CLAUDE?sheetsCfg():null;
-  const online=IN_CLAUDE?'':`<div class="sheet"><h2>Salvataggio online</h2>
+  const au=authOn()?authGet():null;
+  const online=IN_CLAUDE?'':au?`<div class="sheet"><h2>Accesso</h2><p class="note"><b>${esc(au.nome||'')}</b> · staff <b>${esc(au.staff||'')}</b> · autorizzato. Partite e squadre si salvano nel foglio dello staff e gli altri dispositivi autorizzati dello stesso staff si aggiornano da soli.</p></div>`:`<div class="sheet"><h2>Salvataggio online</h2>
     ${cfg&&db?`<p class="note">Collegato a Google Sheets: partite e squadre si salvano nel foglio e gli altri dispositivi collegati si aggiornano da soli.</p>
     <div class="actions"><button class="btn ghost" data-act="sheetsunlink">Scollega</button></div>`
     :`<p class="note">Collega il tuo foglio Google (istruzioni nel README) per ritrovare partite e squadre su iPad, Mac e telefono.</p>
@@ -1681,7 +1923,8 @@ function viewHome(){
     <label class="f">Chiave<input type="text" id="sh-key" value="${esc(cfg?cfg.token:'')}"></label>
     <div class="actions"><button class="btn on" data-act="sheetslink">Collega</button></div>`}</div>`;
   return `<div class="home">
-    <div class="hero"><img src="${LOGO}" alt="" width="96" height="96"><div><h1>Scout Tap</h1><p>Scouting di pallavolo a tap, con codici Data Volley</p></div></div>
+    <div class="hero"><img src="${LOGO}" alt="" width="96" height="96"><div><h1>Scout Tap</h1><p>Scouting di pallavolo a tap, con codici Data Volley</p></div><span style="flex:1"></span>
+      <div class="langsw notr" role="group" aria-label="Lingua / Language"><button class="${LANG==='it'?'on':''}" data-act="lang" data-v="it">Italiano</button><button class="${LANG==='en'?'on':''}" data-act="lang" data-v="en">English</button></div></div>
     <div class="cards">
       <button class="card main" data-act="view" data-v="newmatch"><span class="ic">+</span><b>Nuova partita</b><small>Scegli le due squadre e la formazione</small></button>
       <button class="card" data-act="resume" ${r?'':'disabled'}><span class="ic">▶</span><b>Riprendi partita</b><small>${r?`${esc(r.title)}${r.score?' · '+esc(r.score):''}`:'Nessuna partita in corso'}</small></button>
@@ -1699,7 +1942,7 @@ function matchRow(m,fdate){
 }
 function viewArchive(){
   const all=allMatches();
-  const fdate=m=>matchDate(m)?new Date(matchDate(m)).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}):'';
+  const fdate=m=>matchDate(m)?new Date(matchDate(m)).toLocaleDateString(LOC(),{day:'2-digit',month:'2-digit',year:'numeric'}):'';
   return `<div class="sheet"><div class="actions"><h2>Partite e statistiche</h2><span style="flex:1"></span>${db?'<button class="btn ghost" data-act="listm">Aggiorna elenco</button>':''}</div>
     <p class="note">Apri una partita per vedere statistiche, mappe delle direzioni, tabellino e play by play.</p>
     <div class="matches">${all.length?all.map(m=>`<div class="arow">${matchRow(m,fdate)}${delAsk===m.id?`<button class="btn sm danger" data-act="delm" data-id="${esc(m.id)}">Conferma eliminazione</button>`:`<button class="btn sm ghost" data-act="delask" data-id="${esc(m.id)}" aria-label="Elimina">Elimina</button>`}</div>`).join(''):'<span class="note">Ancora nessuna partita. Creane una da "Nuova partita".</span>'}</div></div>`;
@@ -1751,13 +1994,78 @@ function createMatch(){
 const DEV=(()=>{try{let d=localStorage.getItem(KEY+'.dev');if(!d){d='d'+Math.random().toString(36).slice(2,10);localStorage.setItem(KEY+'.dev',d)}return d}catch(e){return 'd'+Math.random().toString(36).slice(2,10)}})();
 // Collegamento Google Sheets per la versione pubblicata (GitHub Pages): incolla qui URL e chiave per non doverli inserire su ogni dispositivo
 const SHEETS_DEFAULT={url:'',token:''};
+// ACCESSO AUTORIZZATO: incolla qui l'indirizzo del tuo script Google (finisce con /exec).
+// Con l'indirizzo impostato l'app si apre solo per i dispositivi che hai autorizzato nel foglio "utenti".
+const AUTH_URL='';
+const AUTH_GRACE=7*24*3600*1000; // giorni di uso senza rete dopo l'ultimo controllo riuscito
 const IN_CLAUDE=!!(window.claude&&window.claude.use);
 let db=null,unsub=null,syncSt='local',writing=false,again=false,syncT=null,matchList=null;
-function sheetsCfg(){try{const c=JSON.parse(localStorage.getItem(KEY+'.sheets')||'null');if(c&&c.url)return c}catch(e){}return SHEETS_DEFAULT.url?SHEETS_DEFAULT:null}
+function authGet(){let a=null;try{a=JSON.parse(localStorage.getItem(KEY+'.auth')||'null')}catch(e){}
+  if(!a||!a.device){const r=new Uint8Array(16);(window.crypto||{}).getRandomValues?crypto.getRandomValues(r):r.forEach((_,i)=>r[i]=Math.random()*256|0);
+    a={device:[...r].map(x=>x.toString(16).padStart(2,'0')).join(''),status:'unknown'};authPut(a)}
+  return a}
+function authPut(a){try{localStorage.setItem(KEY+'.auth',JSON.stringify(a))}catch(e){}}
+const authOn=()=>!IN_CLAUDE&&!!AUTH_URL;
+function gateState(){
+  if(!authOn())return null;
+  const a=authGet();
+  if(a.status==='ok')return Date.now()-(a.ok||0)<AUTH_GRACE?null:'offline';
+  return a.status||'unknown';
+}
+let authBusy=false,authMsg='';
+async function authCheck(){
+  if(!authOn()||authBusy)return;authBusy=true;
+  const a=authGet(),wasLocked=!!gateState();
+  try{
+    const r=await jsonp(AUTH_URL,{action:'status',token:a.device});
+    a.status=r.status;a.nome=r.nome||a.nome;a.staff=r.staff||'';
+    if(r.status==='ok')a.ok=Date.now();
+    authPut(a);
+    if(r.status==='no')wipeLocal();
+    if(r.status==='ok'&&wasLocked){authBusy=false;S.view='home';initSync();render();return}
+    if(r.status!=='ok'){if(unsub){unsub();unsub=null}db=null}
+  }catch(e){authMsg='net'}
+  authBusy=false;render();
+}
+async function authRequest(){
+  const v=id=>(document.getElementById(id)||{}).value||'';
+  const nome=v('au-nome').trim(),staff=v('au-staff').trim(),email=v('au-email').trim();
+  if(!nome||!staff){toast('Scrivi nome e staff');return}
+  const a=authGet();
+  try{const r=await jsonp(AUTH_URL,{action:'request',token:a.device,nome,staff,email});
+    a.status=r.status;a.nome=nome;a.staffReq=staff;a.reqAt=Date.now();if(r.status==='ok'){a.ok=Date.now();a.staff=r.staff||staff}authPut(a);
+    toast(r.status==='ok'?'Accesso autorizzato':'Richiesta inviata');
+    if(r.status==='ok'){S.view='home';initSync()}
+  }catch(e){toast('Richiesta non riuscita: controlla la connessione')}
+  render();
+}
+function wipeLocal(){
+  try{Object.keys(localStorage).filter(k=>k.startsWith(KEY)&&k!==KEY+'.auth'&&k!==KEY+'.lang'&&k!==KEY+'.dev').forEach(k=>localStorage.removeItem(k))}catch(e){}
+  S=blank();S.view='home';LIB={teams:[],updatedAt:0};matchList=null;
+}
+function viewGate(st){
+  const a=authGet(),sw=`<div class="langsw notr" role="group" aria-label="Lingua / Language"><button class="${LANG==='it'?'on':''}" data-act="lang" data-v="it">Italiano</button><button class="${LANG==='en'?'on':''}" data-act="lang" data-v="en">English</button></div>`;
+  let body;
+  if(st==='unknown')body=`<h2>Richiedi l'accesso</h2><p class="note">Scout Tap si usa solo con l'autorizzazione del responsabile. Compila i dati: riceverà la richiesta e, quando la approva, l'app si sblocca su questo dispositivo.</p>
+    <label class="f">Nome e cognome<input type="text" id="au-nome" value="${esc(a.nome||'')}" autocomplete="name"></label>
+    <label class="f">Staff / squadra<input type="text" id="au-staff" value="${esc(a.staffReq||'')}" placeholder="Es. Under 17 femminile"></label>
+    <label class="f">Email (facoltativa)<input type="text" id="au-email" inputmode="email" autocomplete="email"></label>
+    <div class="actions"><button class="btn on" data-act="authreq">Richiedi accesso</button></div>`;
+  else if(st==='pending')body=`<h2>Richiesta in attesa</h2><p class="note">La richiesta di <b>${esc(a.nome||'')}</b>${a.staffReq?` per lo staff <b>${esc(a.staffReq)}</b>`:''} è stata inviata. Quando il responsabile la approva, l'app si sblocca da sola su questo dispositivo.</p>
+    <div class="actions"><button class="btn on" data-act="authcheck">Controlla di nuovo</button></div>`;
+  else if(st==='no')body=`<h2>Accesso non autorizzato</h2><p class="note">Questo dispositivo non è autorizzato a usare Scout Tap, oppure l'accesso è stato revocato. Per informazioni contatta il responsabile.</p>
+    <div class="actions"><button class="btn" data-act="authcheck">Controlla di nuovo</button></div>`;
+  else body=`<h2>Verifica dell'accesso</h2><p class="note">Sono passati più di 7 giorni dall'ultimo controllo. Collegati a internet per verificare che l'accesso sia ancora attivo.</p>
+    <div class="actions"><button class="btn on" data-act="authcheck">Verifica ora</button></div>`;
+  return `<div class="gate"><div class="hero"><img src="${LOGO}" alt="" width="96" height="96"><div><h1>Scout Tap</h1><p>Scouting di pallavolo a tap, con codici Data Volley</p></div><span style="flex:1"></span>${sw}</div>
+    <div class="sheet">${body}${authBusy?'<p class="note">Controllo in corso…</p>':authMsg==='net'?'<p class="note">Nessuna connessione: riprova quando sei online.</p>':''}
+    <p class="note small">Codice dispositivo: <span class="mono">${a.device.slice(0,8)}</span></p></div></div>`;
+}
+function sheetsCfg(){if(authOn()){const a=authGet();return a.status==='ok'?{url:AUTH_URL,token:a.device}:null}try{const c=JSON.parse(localStorage.getItem(KEY+'.sheets')||'null');if(c&&c.url)return c}catch(e){}return SHEETS_DEFAULT.url?SHEETS_DEFAULT:null}
 function syncBadge(){
   const m={local:['','Solo su questo dispositivo'],ok:['ok','Salvato online'],busy:['busy','Salvataggio…'],err:['err','Non salvato online'],demo:['','Esempio: non salvato online']};
   const k=S.demo&&db?'demo':syncSt;const [c,l]=m[k]||m.local;
-  return `<span class="sync ${c}"><i></i>${l}</span>`;
+  return `<span class="sync ${c}"><i></i>${tr(l)}</span>`;
 }
 function persisted(){const o={};for(const k in S)if(!UI_KEYS.includes(k))o[k]=S[k];return o}
 function metaOf(){return{title:`${S.teams.h.name} – ${S.teams.a.name}`,updatedAt:S.updatedAt,dev:DEV,date:S.date||(S.ltimes||[]).find(Boolean)||S.updatedAt,finished:!!S.finished,score:`${S.sets.map(x=>x.h+'-'+x.a).concat(S.started&&!S.setOver?[S.score.h+'-'+S.score.a]:[]).join(' ')}${S.finished?' (finita)':''}`}}
@@ -1777,7 +2085,7 @@ function jsonp(url,params,ms=15000){return new Promise((res,rej)=>{
   const cb='__scout'+(++jpN);const el=document.createElement('script');
   const clean=()=>{clearTimeout(tm);delete window[cb];el.remove()};
   const tm=setTimeout(()=>{clean();rej(new Error('timeout'))},ms);
-  window[cb]=d=>{clean();d&&d.error?rej(new Error(d.error)):res(d)};
+  window[cb]=d=>{clean();if(d&&d.error==='non autorizzato')setTimeout(authCheck,0);d&&d.error?rej(new Error(d.error)):res(d)};
   el.onerror=()=>{clean();rej(new Error('rete'))};
   el.src=url+(url.includes('?')?'&':'?')+new URLSearchParams({...params,callback:cb});
   document.head.appendChild(el);
@@ -1891,6 +2199,7 @@ const fileBase=()=>`${new Date().toISOString().slice(0,10)}_${S.teams.h.name}_${
 S=load();
 if(!S||S.demo){S=blank()}
 S.view='home';
+document.documentElement.lang=LANG;
 if(!S.demo&&(S.started||S.lines.length))setTimeout(()=>archPut(true),0);
 if(!S.matchId)S.matchId=blank().matchId;
 if(!S.srvType)S.srvType={};
@@ -1900,6 +2209,7 @@ if(!S.timeouts)S.timeouts={h:0,a:0};
 fixArrays();if(!S.setLineups)S.setLineups={};if(S.videoStart==null)S.videoStart='0:00';
 if(!S.startSetter)S.startSetter={h:null,a:null};
 render();
+if(authOn())setTimeout(authCheck,300);
 initSync();
 </script>
 

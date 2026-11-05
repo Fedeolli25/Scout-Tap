@@ -18,34 +18,59 @@ Scouting di pallavolo a tap per iPad, con codici Data Volley, statistiche, mappe
 3. Vai in **Settings → Pages**, scegli **Deploy from a branch**, branch `main`, cartella `/ (root)` e salva.
 4. Dopo un minuto l'app è su `https://<tuo-utente>.github.io/scout-tap/`.
 
-## 2. Collegare Google Sheets (salvataggio tra dispositivi)
+## 2. Accessi autorizzati e salvataggio su Google Sheets
 
-1. Crea un nuovo foglio Google, per esempio "Scout Tap – partite".
+Scout Tap si apre solo sui dispositivi che autorizzi tu. Ogni persona chiede l'accesso dall'app, tu approvi dal foglio Google, e ogni staff vede solo le proprie partite e squadre.
+
+### Preparare il foglio (una volta sola)
+
+1. Crea un nuovo foglio Google, per esempio "Scout Tap – archivio".
 2. Apri **Estensioni → Apps Script**, cancella il contenuto e incolla `apps-script/Code.gs`.
-3. Cambia `CHIAVE` in una parola tua (serve a impedire che altri leggano o scrivano le partite).
+3. Se vuoi ricevere gli avvisi su un'email diversa dalla tua, scrivila in `EMAIL_AVVISI`. Lasciata vuota, usa l'email del tuo account Google.
 4. **Esegui il deployment → Nuovo deployment → App web**:
    - Esegui come: **Me**
-   - Chi ha accesso: **Chiunque**
-5. Autorizza lo script e copia l'indirizzo che finisce con `/exec`.
-6. Nell'app vai in **Squadre → Salvataggio online**, incolla indirizzo e chiave, premi **Collega**.
+   - Chi ha accesso: **Chiunque** (serve perché l'app possa chiamare lo script; i dati restano protetti dall'autorizzazione)
+5. Autorizza lo script e copia l'indirizzo che finisce con `/exec`. Poi, nell'editor, scegli la funzione **prepara** in alto e premi **Esegui**: crea la scheda *utenti* e autorizza l'invio delle email.
+6. In `index.html` cerca la riga
 
-Ripeti il punto 6 su ogni dispositivo. Per non doverlo fare, puoi scrivere indirizzo e chiave direttamente in `index.html`, nella riga:
+   ```js
+   const AUTH_URL='';
+   ```
 
-```js
-const SHEETS_DEFAULT={url:'',token:''};
-```
+   incolla l'indirizzo tra gli apici e carica `index.html` su GitHub.
 
-Attenzione: in quel caso chiunque apra il sito è già collegato al tuo foglio. Se il repository è pubblico, chiunque legga il codice vede anche la chiave.
+### Dare l'accesso
 
-Ogni partita occupa una riga del foglio `partite`. Non modificare a mano le colonne dei dati.
+1. La persona apre l'app: compare **Richiedi l'accesso**. Inserisce nome, staff ed email.
+2. Nel foglio compare la scheda **utenti** con una riga **in attesa**, e ti arriva un'email.
+3. Controlla la colonna **Staff** (correggila se serve: decide quali partite vede) e scrivi **sì** in **Autorizzato**.
+4. L'app della persona si sblocca da sola, oppure toccando **Controlla di nuovo**.
+
+Anche tu fai la richiesta dal tuo iPad e la approvi.
+
+### Gestire gli accessi
+
+- **Revocare**: scrivi **no** in *Autorizzato*. Al controllo successivo l'app su quel dispositivo si blocca e cancella le copie locali (i dati restano nel tuo foglio).
+- **Staff**: dispositivi con lo stesso valore nella colonna *Staff* condividono partite e squadre. Ogni staff ha la sua scheda `partite_<staff>`.
+- **Nuovo dispositivo**: l'accesso è legato al dispositivo. Chi cambia iPad, o cancella i dati del browser, fa una nuova richiesta.
+- **Senza rete**: l'app funziona offline fino a 7 giorni dall'ultimo controllo riuscito, poi chiede di collegarsi per verificare l'accesso.
+- *Ultimo accesso* mostra quando ogni dispositivo si è collegato l'ultima volta.
+
+Non modificare a mano le colonne dei dati nelle schede `partite_…`.
 
 Quando modifichi lo script, usa **Gestisci deployment → Modifica → Nuova versione**: così l'indirizzo `/exec` resta lo stesso.
+
+Nota: l'app è una pagina web pubblica. Chi sa programmare potrebbe copiarne il codice, ma senza la tua autorizzazione non accede mai alle partite e alle squadre salvate nel tuo foglio.
 
 ## 3. Installare sull'iPad
 
 Apri il sito in Safari, tocca **Condividi → Aggiungi alla schermata Home**. L'app si apre a schermo intero e funziona anche offline. I dati restano sempre salvati sull'iPad e si sincronizzano con il foglio quando torna la rete.
 
+Attenzione: per l'autorizzazione l'app installata sulla schermata Home conta come un dispositivo diverso da Safari. Fai la richiesta di accesso dall'app installata, quella che userai in partita.
+
 ## Come si usa
+
+In alto a destra nella Home si sceglie la lingua dell'app: **Italiano** o **English** (schermate, messaggi e PDF; i codici Data Volley non cambiano).
 
 All'apertura c'è la **Home**:
 
@@ -60,12 +85,12 @@ Quando una squadra vince 3 set compaiono due bottoni: **Chiudi la rilevazione** 
 
 - **Su ogni dispositivo**: sempre, a ogni azione.
 - **Online**: pochi secondi dopo ogni modifica. Lo stato è in alto: "Salvato online", "Salvataggio…" o "Non salvato online".
-- **Altri dispositivi**: controllano gli aggiornamenti ogni 5 secondi. Conviene che una sola persona scouti e le altre guardino: se due dispositivi scrivono insieme, vince l'ultimo salvataggio.
+- **Altri dispositivi dello stesso staff**: controllano gli aggiornamenti ogni 5 secondi. Conviene che una sola persona scouti e le altre guardino: se due dispositivi scrivono insieme, vince l'ultimo salvataggio.
 - **File**: in **Codici** puoi scaricare i codici con l'orario (`.txt`), fare il backup della partita (`.json`) e reimportarlo.
 
 ## Aggiornare l'app
 
-Sostituisci `index.html` su GitHub. Se l'iPad continua a mostrare la versione vecchia, cambia `scout-tap-v1` in `scout-tap-v2` dentro `sw.js` e carica anche quello.
+Sostituisci `index.html` su GitHub (ricordati di lasciare il tuo indirizzo in `AUTH_URL`). Se l'iPad continua a mostrare la versione vecchia, aumenta il numero di versione dentro `sw.js` (per esempio da `scout-tap-v18` a `scout-tap-v19`) e carica anche quello.
 
 ## Report PDF
 

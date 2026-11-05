@@ -1996,7 +1996,7 @@ const DEV=(()=>{try{let d=localStorage.getItem(KEY+'.dev');if(!d){d='d'+Math.ran
 const SHEETS_DEFAULT={url:'',token:''};
 // ACCESSO AUTORIZZATO: incolla qui l'indirizzo del tuo script Google (finisce con /exec).
 // Con l'indirizzo impostato l'app si apre solo per i dispositivi che hai autorizzato nel foglio "utenti".
-const AUTH_URL='';
+const AUTH_URL='https://script.google.com/macros/s/AKfycby-U9BwL2xMpXBl7vVJbWqfstptmC9fm27kR7v1Dt45TCHL43i3qTevAMTtGrcrakG3/exec';
 const AUTH_GRACE=7*24*3600*1000; // giorni di uso senza rete dopo l'ultimo controllo riuscito
 const IN_CLAUDE=!!(window.claude&&window.claude.use);
 let db=null,unsub=null,syncSt='local',writing=false,again=false,syncT=null,matchList=null;

@@ -216,6 +216,10 @@ button.brand{background:none;border:0;padding:0;text-align:left;color:inherit}
 .card.serve.h .ic{color:var(--home)}.card.serve.a .ic{color:var(--away)}
 .card.serve.sug{border:2px solid var(--ink)}
 .bctl{display:flex;gap:6px;width:100%;flex-wrap:wrap}
+.btn.sm.ico{flex:0 0 44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.libauto{width:100%;display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:10px;background:var(--surface2)}
+.librow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.librow .lbl{width:70px}
+.libgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .btn.sm{height:38px;font-size:13px;font-weight:500;flex:1;min-width:0}
 .bchip small{font-family:var(--font-mono);font-size:10px;opacity:.7}
 .chip.isl{background:color-mix(in srgb,var(--e-ex) 22%,var(--surface))}
@@ -397,6 +401,11 @@ const TR_EXACT={
 'Prima tocca in campo chi esce':'First tap on court who goes out','Tocca la panchina della squadra che fa il doppio cambio':'Tap the bench of the team making the double sub',
 'Uno dei due è già un subentrato: usa il Cambio singolo':'One of the two is already a substitute: use the single Sub','Fai prima uscire il libero':'Take the libero out first','Prima indica il palleggiatore nella formazione':'First set the setter in the line-up',
 'In campo servono un palleggiatore (S) e un opposto (O)':'A setter (S) and an opposite (O) are needed on court',
+// libero automatico e rotazione
+'Libero di ricezione':'Reception libero','Libero di difesa':'Defence libero','Nessuno':'None','Libero automatico':'Automatic libero','Torna al centrale':'Back to the middle blocker','Al posto del':'In place of','invece del centrale':'instead of the middle blocker','Oppure fai entrare a mano (resta al posto del giocatore scelto finché è in seconda linea)':'Or bring one in manually (stays in for the chosen player while they are in the back row)',
+'Rotazione precedente':'Previous rotation','Ruota: rotazione successiva':'Rotate: next rotation','Ruota: rotazione precedente':'Rotate: previous rotation',
+'Nessun libero in rosa: aggiungi L dopo il nome per usarlo.':'No libero in the roster: add L after the name to use one.',
+'Il libero entra da solo al posto del centrale di seconda linea: quello di ricezione quando batte l\'avversario, quello di difesa quando batte la propria squadra. Scegli lo stesso libero in entrambi se ne usate uno solo, "Nessuno" in entrambi per gestirlo a mano.':'The libero comes in automatically for the back-row middle blocker: the reception libero when the opponent serves, the defence libero when their own team serves. Choose the same libero in both if you use only one, "None" in both to manage it manually.',
 // accesso
 'Richiedi l\'accesso':'Request access','Scout Tap si usa solo con l\'autorizzazione del responsabile. Compila i dati: riceverà la richiesta e, quando la approva, l\'app si sblocca su questo dispositivo.':'Scout Tap can only be used with the manager\'s authorisation. Fill in your details: the manager will receive the request and, once approved, the app unlocks on this device.',
 'Nome e cognome':'Full name','Staff / squadra':'Staff / team','Email (facoltativa)':'Email (optional)','Richiedi accesso':'Request access','Es. Under 17 femminile':'E.g. Women\'s Under 17',
@@ -673,14 +682,40 @@ function libIn(t,lib,target){
   if(i===0&&S.serving===t){toast('Il libero non può battere');return false}
   if(L)libOut(t,true);
   S.lineup[t][S.lineup[t].findIndex(x=>x==target)]=lib;S.lib[t]={num:lib,rep:target};
+  {const A=libAutoOf(t);if(A&&(A.rec||A.def)){const si=setterIdx(t),i=S.lineup[t].findIndex(x=>x==lib);A.target=si>=0&&SEATS[(i-si+6)%6]==='C'?null:target}}
   toast(`Entra il libero ${lib} al posto di ${target}`);return true;
 }
 function libCheck(t){
   const L=libOf(t);if(!L)return;
   const i=S.lineup[t].findIndex(x=>x==L.num);
-  if(i>=1&&i<=3){libOut(t,true);toast(`Il libero ${L.num} va in prima linea: rientra ${L.rep}`)}
+  if(i>=1&&i<=3){libOut(t,true);const A=libAutoOf(t);if(!(A&&(A.rec||A.def)))toast(`Il libero ${L.num} va in prima linea: rientra ${L.rep}`)}
 }
 function rotate(t){const L=S.lineup[t];S.lineup[t]=[L[1],L[2],L[3],L[4],L[5],L[0]]}
+function rotateBack(t){const L=S.lineup[t];S.lineup[t]=[L[5],L[0],L[1],L[2],L[3],L[4]]}
+/* libero automatico: entra al posto del centrale di seconda linea.
+   Ricezione quando batte l'avversario, difesa quando batte la propria squadra.
+   Se il centrale è in zona 1 e la sua squadra batte, batte il centrale e il libero resta fuori. */
+function libAutoOf(t){if(!S.libAuto)S.libAuto={};return S.libAuto[t]||null}
+function autoLibero(t){
+  const A=libAutoOf(t);if(!A||!(A.rec||A.def)||!S.started)return;
+  const si=setterIdx(t);if(si<0)return;
+  const want=S.serving===t?(A.def||A.rec):(A.rec||A.def);
+  let ti=-1;
+  // giocatore scelto a mano: il libero resta al suo posto finché è in seconda linea
+  if(A.target!=null){const L0=libOf(t);let i=S.lineup[t].findIndex(x=>x==A.target);if(i<0&&L0&&L0.rep==A.target)i=S.lineup[t].findIndex(x=>x==L0.num);if(i===0||i===4||i===5)ti=i}
+  if(ti<0)for(let i of [0,4,5])if(SEATS[(i-si+6)%6]==='C')ti=i;
+  if(ti<0)return;
+  const L=libOf(t);
+  if(S.serving===t&&ti===0){if(L)libOut(t,true);return}
+  if(L&&L.num==want&&S.lineup[t][ti]==L.num)return;
+  if(L)libOut(t,true);
+  const tgt=S.lineup[t][ti];if(isLib(t,tgt))return;
+  S.lineup[t][ti]=want;S.lib[t]={num:want,rep:tgt};
+}
+function defaultLibAuto(t){
+  const ls=liberos(t).map(p=>p.n);
+  return{rec:ls[0]||null,def:ls[1]||ls[0]||null};
+}
 const setsWon=t=>S.sets.filter(s=>(t==='h'?s.h>s.a:s.a>s.h)).length;
 
 function predictObj(){
@@ -788,6 +823,7 @@ function endRally(w){
   S.rallies.push({set:S.set,serving:S.serving,winner:w,rotH:rot('h'),rotA:rot('a')});
   S.score[w]++;
   if(w!==S.serving){rotate(w);S.serving=w;libCheck(w)}
+  autoLibero('h');autoLibero('a');
   addLine(`${tc(w)}p${p2(S.score.h)}:${p2(S.score.a)}`);
   S.rally=[];S.subMode=null;
   const tgt=S.set===5?15:25,h=S.score.h,a=S.score.a;
@@ -810,6 +846,8 @@ function startSet(){
   S.serving=S.firstServe;S.started=true;S.view='scout';S.rally=[];S.pending=null;S.subMode=null;S.libMode=null;
   S.subs={h:{n:0,pairs:[]},a:{n:0,pairs:[]}};S.lib={h:null,a:null};S.dblMode=null;S.setter={h:S.startSetter.h,a:S.startSetter.a};S.timeouts={h:0,a:0};S.link=null;
   if(!S.setLineups)S.setLineups={};S.setLineups[S.set]={h:[...S.lineup.h],a:[...S.lineup.a],sh:S.setter.h,sa:S.setter.a,rh:rot('h'),ra:rot('a'),t:Date.now()};
+  if(!S.libAuto)S.libAuto={};for(const t of ['h','a']){if(!S.libAuto[t])S.libAuto[t]=defaultLibAuto(t);S.libAuto[t].target=null}
+  autoLibero('h');autoLibero('a');
   predict();save();render();
 }
 function nextSet(){snap();S.finished=false;S.set++;S.score={h:0,a:0};S.setOver=null;S.started=false;S.firstServe=opp(S.firstServe);S.view='setup';save();render()}
@@ -954,7 +992,9 @@ function benchHTML(t){
   let lbl=`${esc(S.teams[t].name)} · cambi ${st.n}/${LIM}${L?` · libero ${L.num} per ${L.rep}`:''}`,chips;
   if(lm&&!S.libMode.lib){
     lbl='Quale libero entra?';
-    chips=liberos(t).map(p=>`<button class="bchip ${t} lib ${L&&L.num==p.n?'on':''}" data-act="libpick" data-t="${t}" data-n="${p.n}">${p.n} ${esc(p.name)}</button>`).join('')+(L?`<button class="bchip ${t}" data-act="libout" data-t="${t}">Esce il libero</button>`:'');
+    const A=libAutoOf(t)||{},row=k=>`<div class="librow"><span class="lbl">${k==='rec'?'Ricezione':'Difesa'}</span>${liberos(t).map(p=>`<button class="bchip ${t} lib ${A[k]==p.n?'on':''}" data-act="libset" data-t="${t}" data-k="${k}" data-n="${p.n}">${p.n}</button>`).join('')}<button class="bchip ${t} ${!A[k]?'on':''}" data-act="libset" data-t="${t}" data-k="${k}" data-n="">–</button></div>`;
+    chips=`<div class="libauto"><span class="lbl">Libero automatico</span>${row('rec')}${row('def')}${A.target!=null&&(A.rec||A.def)?`<div class="librow"><span class="note">Al posto del <b>${A.target}</b> invece del centrale</span><button class="bchip ${t}" data-act="libtgt" data-t="${t}">Torna al centrale</button></div>`:''}</div><span class="lbl" style="width:100%">Oppure fai entrare a mano (resta al posto del giocatore scelto finché è in seconda linea)</span>`+
+      liberos(t).map(p=>`<button class="bchip ${t} lib ${L&&L.num==p.n?'on':''}" data-act="libpick" data-t="${t}" data-n="${p.n}">${p.n} ${esc(p.name)}</button>`).join('')+(L?`<button class="bchip ${t}" data-act="libout" data-t="${t}">Esce il libero</button>`:'');
   }else{
     const dm=S.dblMode&&S.dblMode.team===t;
     if(dm){const z=dblSeats(t);lbl=!S.dblMode.p?`Doppio cambio: chi entra come palleggiatore (al posto di ${z.opN})?`:`Palleggiatore ${S.dblMode.p}. Chi entra come opposto (al posto di ${z.spN})?`}
@@ -963,7 +1003,9 @@ function benchHTML(t){
     chips=b.map(p=>`<button class="bchip ${t} ${p.role==='L'?'lib':''} ${(S.sel&&S.sel.team===t&&S.sel.num==p.n&&!(S.dblMode&&S.dblMode.team===t))||(S.dblMode&&S.dblMode.team===t&&S.dblMode.p==p.n)?'on':''}" data-act="bench" data-t="${t}" data-n="${p.n}">${p.n}${p.role==='L'?' <small>L</small>':''}</button>`).join('')||'<span class="note">vuota</span>';
   }
   return `<div class="bench"><span class="lbl">${lbl}</span>${chips}
-    <div class="bctl"><button class="btn sm ${sm?'on':''}" data-act="sub" data-t="${t}">Cambio</button><button class="btn sm ${S.dblMode&&S.dblMode.team===t?'on':''}" data-act="dbl" data-t="${t}">Doppio cambio</button><button class="btn sm ${lm?'on':''}" data-act="lib" data-t="${t}">Libero</button></div></div>`;
+    <div class="bctl"><button class="btn sm ${sm?'on':''}" data-act="sub" data-t="${t}">Cambio</button><button class="btn sm ${S.dblMode&&S.dblMode.team===t?'on':''}" data-act="dbl" data-t="${t}">Doppio cambio</button><button class="btn sm ${lm?'on':''}" data-act="lib" data-t="${t}">Libero</button>
+      <button class="btn sm ico" data-act="rotfix" data-t="${t}" data-d="next" title="Rotazione successiva" aria-label="Ruota: rotazione successiva"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5.5 9.5A7 7 0 1 1 5 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M2.8 5.2 5.6 10l4.9-2.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="btn sm ico" data-act="rotfix" data-t="${t}" data-d="prev" title="Rotazione precedente" aria-label="Ruota: rotazione precedente"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="transform:scaleX(-1)"><path d="M5.5 9.5A7 7 0 1 1 5 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M2.8 5.2 5.6 10l4.9-2.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>`;
 }
 function viewScout(){
   const rallyChips=S.rally.length?S.rally.map(a=>`<span class="code ${a.team}">${a.code}</span>`).join(''):(()=>{
@@ -1589,7 +1631,13 @@ function viewSetup(){
       <button class="btn rotbtn" data-act="rotstart" data-t="${t}" title="Rotazione successiva" aria-label="Ruota la formazione: rotazione successiva"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5.5 9.5A7 7 0 1 1 5 14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M2.8 5.2 5.6 10l4.9-2.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Ruota</button></div>
     <div class="lineup">${sel(4)}${sel(3)}${sel(2)}${sel(5)}${sel(6)}${sel(1)}</div>
     <label class="f">Palleggiatore (decide la rotazione e i ruoli)<select id="ps-${t}" data-act="setter" data-t="${t}"><option value="">–</option>${S.start[t].map((n,i)=>n?`<option value="${n}" ${S.startSetter&&S.startSetter[t]==n?'selected':''}>${n} ${esc((P(t,n)||{}).name||'')} · P${i+1}</option>`:'').join('')}</select></label>
-    ${roleHint(t)}</div>`;
+    ${roleHint(t)}
+    ${(()=>{const ls=liberos(t);if(!ls.length)return '<p class="note">Nessun libero in rosa: aggiungi L dopo il nome per usarlo.</p>';
+      if(!S.libAuto)S.libAuto={};if(!S.libAuto[t])S.libAuto[t]=defaultLibAuto(t);const A=S.libAuto[t];
+      const opt=k=>`<option value="">Nessuno</option>${ls.map(p=>`<option value="${p.n}" ${A[k]==p.n?'selected':''}>${p.n} ${esc(p.name)}</option>`).join('')}`;
+      return `<div class="libgrid"><label class="f">Libero di ricezione<select id="lr-${t}" data-act="libauto" data-t="${t}" data-k="rec">${opt('rec')}</select></label>
+        <label class="f">Libero di difesa<select id="ld-${t}" data-act="libauto" data-t="${t}" data-k="def">${opt('def')}</select></label></div>
+        <p class="note">Il libero entra da solo al posto del centrale di seconda linea: quello di ricezione quando batte l'avversario, quello di difesa quando batte la propria squadra. Scegli lo stesso libero in entrambi se ne usate uno solo, "Nessuno" in entrambi per gestirlo a mano.</p>`})()}</div>`;
   };
   const inf=S.info||{},fi=(k,l,ph='')=>`<label class="f">${l}<input type="text" id="inf-${k}" data-act="info" data-k="${k}" value="${esc(inf[k]||'')}" placeholder="${ph}"></label>`;
   const infoBox=`<div class="sheet"><h2>Dati partita (per il tabellino)</h2><div class="infogrid">${fi('fase','Fase','Andata, Ritorno, Playoff…')}${fi('citta','Città')}${fi('impianto','Impianto')}${fi('spettatori','Spettatori')}${fi('arbitri','Arbitri')}${fi('mvp','MVP')}${fi('all_h','Allenatore '+esc(S.teams.h.name))}${fi('ass_h','Assistente '+esc(S.teams.h.name))}${fi('all_a','Allenatore '+esc(S.teams.a.name))}${fi('ass_a','Assistente '+esc(S.teams.a.name))}</div></div>`;
@@ -1762,6 +1810,10 @@ document.addEventListener('click',e=>{
       if(S.libMode&&S.libMode.team===t){S.libMode=null;break}
       const ls=liberos(t);if(!ls.length){toast('Nessun libero in rosa: segna il ruolo L in Squadre');return}
       S.libMode={team:t,lib:ls.length===1&&!libOf(t)?ls[0].n:null};break;}
+    case 'rotfix':{snap();b.dataset.d==='prev'?rotateBack(t):rotate(t);libCheck(t);autoLibero(t);S.pending=null;S.att=null;S.srv=null;predict();
+      toast(`${S.teams[t].name}: ora in P${rot(t)}`);break;}
+    case 'libtgt':{const A=libAutoOf(t);if(!A)return;snap();A.target=null;autoLibero(t);break;}
+    case 'libset':{if(!S.libAuto)S.libAuto={};if(!S.libAuto[t])S.libAuto[t]={rec:null,def:null};snap();S.libAuto[t][b.dataset.k]=b.dataset.n?+b.dataset.n:null;autoLibero(t);break;}
     case 'libpick':{
       const L=libOf(t);
       if(L&&L.num!=n){snap();const i=S.lineup[t].findIndex(x=>x==L.num);S.lineup[t][i]=n;toast(`Cambio libero: entra ${n}, esce ${L.num}`);L.num=n;S.libMode=null;break}
@@ -1824,6 +1876,7 @@ document.addEventListener('change',e=>{
   if(act==='mappl'){S.map.pl=el.value;saveLocal();render();return}
   if(act==='name'){S.teams[t].name=el.value.trim()||(t==='h'?'Casa':'Ospiti');S.demo=false;pushTeamToLib(t)}
   else if(act==='roster'){S.teams[t].players=parseRoster(el.value);S.demo=false;pushTeamToLib(t)}
+  else if(act==='libauto'){if(!S.libAuto)S.libAuto={};if(!S.libAuto[t])S.libAuto[t]=defaultLibAuto(t);S.libAuto[t][el.dataset.k]=el.value?+el.value:null;if(S.started){snap();autoLibero(t)}}
   else if(act==='setter'){if(!S.startSetter)S.startSetter={h:null,a:null};S.startSetter[t]=el.value?+el.value:null}
   else if(act==='lineup'){const z=+el.dataset.z;S.start[t][z-1]=el.value?+el.value:null;if(S.start[t].length<6)for(let i=0;i<6;i++)S.start[t][i]=S.start[t][i]??null}
   else return;
